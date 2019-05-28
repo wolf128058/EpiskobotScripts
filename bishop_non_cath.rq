@@ -1,0 +1,11 @@
+# no-cath-rel but cath-bishop
+SELECT ?item ?itemLabel ?birthLabel ?cathiLabel WHERE {
+  ?item wdt:P39 wd:Q611644;
+    wdt:P569 ?birth.
+  FILTER(NOT EXISTS { ?item wdt:P140 ?statement. })
+  FILTER(EXISTS { ?item wdt:P1047 ?statement. })
+  FILTER((YEAR(?birth)) >= 1000 )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de". }
+}
+ORDER BY DESC (?birthLabel)
+LIMIT 1000
