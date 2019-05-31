@@ -1,0 +1,9 @@
+# catholizism following bishops
+#
+SELECT ?item ?itemLabel ?cathiLabel WHERE {
+  ?item wdt:P39 wd:Q611644;
+    wdt:P1047 ?cathi.
+  FILTER(EXISTS { ?item wdt:P140 wd:Q1841. })
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de". }
+}
+LIMIT 5000
