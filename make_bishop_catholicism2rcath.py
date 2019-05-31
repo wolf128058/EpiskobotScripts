@@ -4,7 +4,7 @@
 import pywikibot
 from pywikibot import pagegenerators as pg
 
-with open('bishop_catholizism.rq', 'r') as query_file:
+with open('bishop_catholicism.rq', 'r') as query_file:
     QUERY = query_file.read()
 
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
@@ -21,5 +21,7 @@ for item in generator:
     for claim in claim_list:
         trgt = claim.getTarget()
         print("Claim for {} found.".format(trgt.id))
-        correct_page = pywikibot.ItemPage(repo, "Q9592", 0)
-        claim.changeTarget(correct_page)
+        if trgt.id == 'Q1841':
+            correct_page = pywikibot.ItemPage(repo, "Q9592", 0)
+            claim.changeTarget(correct_page)
+            item.addClaim(claim, summary=u'catholic bishop of r.catholic religion (not only catholicism)')
