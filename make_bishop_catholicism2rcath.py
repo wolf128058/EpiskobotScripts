@@ -23,5 +23,4 @@ for item in generator:
         print("Claim for {} found.".format(trgt.id))
         if trgt.id == 'Q1841':
             correct_page = pywikibot.ItemPage(repo, "Q9592", 0)
-            claim.changeTarget(correct_page)
-            item.addClaim(claim, summary=u'catholic bishop of r.catholic religion (not only catholicism)')
+            claim.changeTarget(correct_page, summary=u'catholic bishop of r.catholic religion (not only catholicism)')
