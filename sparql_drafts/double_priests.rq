@@ -1,0 +1,19 @@
+# double-priests
+# ==============
+# - are priests (Q42603) and catholic priests (Q250867) at the same time
+#
+# todo:
+# if religion (P140) is only a catholic one,
+# the common priest could imho be removed
+#
+
+SELECT ?priest ?priestLabel ?birthLabel ?cathiLabel WHERE {
+  ?priest wdt:P106 wd:Q250867;
+    wdt:P569 ?birth.
+  FILTER(EXISTS { ?priest wdt:P106 wd:Q42603. })
+  FILTER(EXISTS { ?priest wdt:P106 wd:Q250867. })
+  FILTER((YEAR(?birth)) >= 1000 )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de". }
+}
+ORDER BY DESC (?birthLabel)
+LIMIT 5000
