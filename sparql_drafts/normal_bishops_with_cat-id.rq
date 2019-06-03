@@ -1,0 +1,16 @@
+# Quite "normal" bishop (Q29182) with a catholic-hierarchy-entry (P1047)
+# 
+# Todo:
+# - Check if no second religion is given.
+# - Even Check Wikipedia-Entries for evidence for beeing just a "normal" or non-catholic Bishop
+# - Otherwise and if only religion is roman-catholic Church, than make a "catholic Bishop" (Q611644) out of him.
+#
+
+SELECT ?bishop ?bishopLabel ?birthLabel WHERE {
+  ?bishop wdt:P39 wd:Q29182;
+    wdt:P569 ?birth.
+  FILTER(EXISTS { ?bishop wdt:P1047 ?statement. })
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de". }
+}
+ORDER BY DESC (?birthLabel)
+LIMIT 5000
