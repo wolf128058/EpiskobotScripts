@@ -1,0 +1,10 @@
+# Statistic: Most diligent consecrators
+#
+
+SELECT ?bishop ?bishopLabel (COUNT(?conse) AS ?count) WHERE {
+  ?bishop wdt:P39 wd:Q611644.
+  ?conse wdt:P1598 ?bishop.
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+}
+GROUP BY ?bishop ?bishopLabel
+ORDER BY DESC (?count)
