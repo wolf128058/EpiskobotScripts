@@ -26,35 +26,17 @@ for item in generator:
         mycathid = cathids.getTarget()
         print '>> Catholic-Hierarchy-Id: ' + mycathid
 
-    for claim in claim_list_religion:
-        trgt = claim.getTarget()
+    for rel_claim in claim_list_religion:
+        trgt = rel_claim.getTarget()
         print '-- Claim for {} found.'.format(trgt.id)
         if trgt.id == 'Q9592':
-            # print claim
-            ref_claim = claim.fromJSON(repo, {
-                u'type': u'statement',
-                u'references': [{u'snaks': {u'P1047': [{
-                    u'datatype': u'external-id',
-                    u'datavalue': {u'type': u'string',
-                                   u'value': mycathid},
-                    u'property': u'P1047',
-                    u'snaktype': u'value',
-                    }]}, u'hash': None, u'snaks-order': [u'P1047']}],
-                u'mainsnak': {
-                    u'datatype': u'wikibase-item',
-                    u'datavalue': {u'type': u'wikibase-entityid',
-                                   u'value': {u'entity-type': u'item',
-                                   u'numeric-id': 9592}},
-                    u'property': u'P140',
-                    u'snaktype': u'value',
-                    },
-                u'rank': u'normal',
-                })
 
-            correct_page = pywikibot.ItemPage(repo, 'Q9592', 0)
             if changed == False:
-                item.removeClaims(claim)
-                item.addClaim(ref_claim, summary=u' add catholic-hierarchy as source for religion')
+                source_claim = pywikibot.Claim(repo, u'P1047')
+                source_claim.setTarget(mycathid)
+                rel_claim_sources = rel_claim.getSources()
+                if len(rel_claim_sources) == 0:
+                    rel_claim.addSources([source_claim], summary=u'add catholic-hierarchy as source for religion')
                 changed=True
 print('Done!')
 
