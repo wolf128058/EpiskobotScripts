@@ -15,10 +15,9 @@ SELECT ?item ?itemLabel ?religion ?cathid WHERE {
     wdt:P569 ?birth;
 
   FILTER(NOT EXISTS {
-    ?item p:P140 _:b75.
-    _:b75 ps:P140 ?relsub;
-      prov:wasDerivedFrom _:b74.
-    _:b74 pr:P1047 ?relref.
+    ?item p:P140 _:b80.
+    _:b80 ps:P140 ?relsub2;
+      prov:wasDerivedFrom _:b30.
   })
 
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
