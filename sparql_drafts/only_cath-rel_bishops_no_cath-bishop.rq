@@ -1,0 +1,24 @@
+# non-catholic bishops of only catholic-church-religion
+# ==============
+# - are bishops (P39=Q29182) of catholic-church as only religion (P140=Q9592)
+#
+# todo:
+# make them catholic-bishops (P39=Q611644)
+# the common priest could imho be removed
+#
+
+SELECT ?bishop ?bishopLabel (COUNT(?religion) AS ?relCount) ?birthLabel ?cathiLabel WHERE {
+  ?bishop wdt:P39 wd:Q29182;
+    wdt:P140 ?religion;
+    wdt:P569 ?birth;
+    wdt:P1047 ?cathi.
+  FILTER(EXISTS { ?bishop wdt:P140 wd:Q9592. })
+  FILTER(EXISTS { ?bishop wdt:P1047 ?statement. })
+  FILTER(NOT EXISTS { ?bishop wdt:P1598 ?statement. })
+  FILTER((YEAR(?birth)) >= 1500 )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
+}
+GROUP BY ?bishop ?bishopLabel ?birthLabel ?cathiLabel
+HAVING ((COUNT(?religion)) = 1 )
+ORDER BY DESC (?birth)
+LIMIT 5000
