@@ -20,5 +20,5 @@ SELECT ?bishop ?bishopLabel (COUNT(?religion) AS ?relCount) ?birthLabel ?cathiLa
 }
 GROUP BY ?bishop ?bishopLabel ?birthLabel ?cathiLabel
 HAVING ((COUNT(?religion)) = 1 )
-ORDER BY DESC (?birth)
+ORDER BY DESC (?birthLabel)
 LIMIT 5000
