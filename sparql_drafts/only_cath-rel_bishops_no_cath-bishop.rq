@@ -13,8 +13,6 @@ SELECT ?bishop ?bishopLabel (COUNT(?religion) AS ?relCount) ?birthLabel ?cathiLa
     wdt:P569 ?birth;
     wdt:P1047 ?cathi.
   FILTER(EXISTS { ?bishop wdt:P140 wd:Q9592. })
-  FILTER(EXISTS { ?bishop wdt:P1047 ?statement. })
-  FILTER(NOT EXISTS { ?bishop wdt:P1598 ?statement. })
   FILTER((YEAR(?birth)) >= 1500 )
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
