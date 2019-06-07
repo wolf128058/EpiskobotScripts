@@ -6,13 +6,17 @@
 # make them catholic-bishops (P39=Q611644)
 # the common priest could imho be removed
 #
-
 SELECT ?bishop ?bishopLabel (COUNT(?religion) AS ?relCount) ?birthLabel ?cathiLabel WHERE {
   ?bishop wdt:P39 wd:Q29182;
     wdt:P140 ?religion;
     wdt:P569 ?birth;
     wdt:P1047 ?cathi.
   FILTER(EXISTS { ?bishop wdt:P140 wd:Q9592. })
+  FILTER(NOT EXISTS {
+    ?bishop p:P39 _:b80.
+    _:b80 ps:P39 ?posSource;
+      prov:wasDerivedFrom _:b30.
+  })
   FILTER((YEAR(?birth)) >= 1500 )
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
