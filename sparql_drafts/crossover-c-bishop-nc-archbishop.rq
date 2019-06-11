@@ -1,0 +1,18 @@
+# cross-over cath-bishop non-cath-arch-bishop
+# ==============
+# - are catholic bishops (Q611644) and "normal" archbishops (Q49476) at the same time
+#
+# todo:
+# make them catholic archbishops (Q48629921) instead
+#
+
+SELECT ?item ?itemLabel ?birthLabel ?cathiLabel WHERE {
+  ?item wdt:P39 wd:Q49476;
+    wdt:P569 ?birth.
+  FILTER(EXISTS { ?item wdt:P1047 ?statement. })
+  FILTER(EXISTS { ?item wdt:P39 wd:Q611644. })
+  FILTER(EXISTS { ?item wdt:P140 wd:Q9592. })
+  FILTER((YEAR(?birth)) >= 0 )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
+}
+ORDER BY DESC (?birthLabel)
