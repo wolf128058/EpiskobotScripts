@@ -6,7 +6,7 @@
 # - but do not have a reference for that position held
 #
 # todo: set catholic-hierarchy and their id as reference for their position 
-# cat-id
+# 
 
 SELECT ?item ?itemLabel ?religion ?cathid ?rel2sub WHERE {
   ?item wdt:P39 wd:Q611644;
