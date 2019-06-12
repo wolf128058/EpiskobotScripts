@@ -1,0 +1,14 @@
+# catholic bishops (Q611644) or -archbishops(Q48629921) without consecrator (P1598)
+# Todo: Find their consecrator on catholic-hierarchy.org
+
+SELECT ?bishop ?bishopLabel ?birthLabel ?cathiLabel WHERE {
+  ?bishop wdt:P1047 ?cathi;
+    wdt:P569 ?birth;
+    wdt:P1047 ?cathi;
+    wdt:P39 ?position
+  FILTER( ?position IN (wd:Q611644, wd:Q48629921) )
+  FILTER(NOT EXISTS { ?bishop wdt:P1598 ?statement. })
+  FILTER((YEAR(?birth)) >= 0 )
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
+}
+ORDER BY DESC (?birthLabel)
