@@ -11,15 +11,13 @@ with open('cathid-no-rel-ref.rq', 'r') as query_file:
 
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
 
-# print(QUERY)
-
 generator = pg.WikidataSPARQLPageGenerator(QUERY, site=wikidata_site)
 repo = wikidata_site.data_repository()
 
 for item in generator:
     itemdetails = item.get()
     mycathid = ''
-    changed=False
+    changed = False
 
     claim_list_religion = itemdetails['claims']['P140']
     claim_list_cathid = itemdetails['claims']['P1047']
@@ -38,10 +36,12 @@ for item in generator:
                 source_claim.setTarget(mycathid)
                 rel_claim_sources = rel_claim.getSources()
                 if len(rel_claim_sources) == 0:
-                    r = requests.head('http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html')
+                    r = requests.head(
+                        'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html')
                     if r.status_code == 200:
-                        print('-- Status 200 received for: ' + 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html')
-                        rel_claim.addSources([source_claim], summary=u'add catholic-hierarchy as source for religion')
-                changed=True
+                        print('-- Status 200 received for: ' +
+                              'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html')
+                        rel_claim.addSources(
+                            [source_claim], summary=u'add catholic-hierarchy as source for religion')
+                changed = True
 print('Done!')
-
