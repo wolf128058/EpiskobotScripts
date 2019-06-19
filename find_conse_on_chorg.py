@@ -11,7 +11,7 @@ import requests
 path4qs ='log_quick_consefounds.txt'
 
 QUERY = """
-SELECT ?item ?itemLabel ?birthLabel ?cathiLabel WHERE {
+SELECT ?item ?itemLabel ?cathiLabel WHERE {
   ?item wdt:P1047 ?cathi.
   FILTER(NOT EXISTS { ?item wdt:P1598 ?statement. })
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
