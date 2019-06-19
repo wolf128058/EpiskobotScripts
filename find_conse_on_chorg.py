@@ -77,8 +77,6 @@ for item in generator:
                             conse_setter_id = item.id
                         if count_conse_found == 1:
                             print '!!! Conse found: ' + conse_setter_id + ' => ' + conse_getter_id
-                            f.write("\n" + 'https://www.wikidata.org/wiki/' +
-                                    conse_getter_id + "\t\t" + conse_setter_id)
                             fq = open(path4qs, "a")
                             fq.write("\n" + conse_getter_id +
                                      "\tP1598\t" + conse_setter_id)
