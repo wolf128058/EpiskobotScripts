@@ -18,6 +18,7 @@ SELECT ?item ?itemLabel ?conse (COUNT(?conse) AS ?count) WHERE {
 }
 GROUP BY ?item ?itemLabel ?conse
 HAVING (?count = 1 )
+ORDER BY RAND()
 LIMIT 100
 '''
 
@@ -92,6 +93,6 @@ for item in generator:
                             q_as = pywikibot.Claim(repo, 'P2868', is_qualifier=True)
                             principal_claim = pywikibot.ItemPage(repo, u'Q18442817')
                             q_as.setTarget(principal_claim)
-                            claim_list_conse[0].addQualifier(q_as)
+                            claim_list_conse[0].addQualifier(q_as, summary=u'checked on catholic-hierarchy: this is the principal consecrator')
 
 print('Done!')
