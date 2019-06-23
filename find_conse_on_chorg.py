@@ -11,7 +11,7 @@ import lxml.html
 import re
 import requests
 
-path4qs ='log_quick_consefounds.txt'
+path4qs = 'log_quick_consefounds.txt'
 
 QUERY = """
 SELECT ?item ?itemLabel ?cathiLabel ?birthLabel WHERE {
@@ -88,7 +88,7 @@ for item in generator:
                             print '-- checking ch.org for conse-info: ' + 'http://www.catholic-hierarchy.org/bishop/b' + conse_match.groups()[0] + '.html'
                             os.system("./create_by_chorg-id.py " + conse_match.groups()[0] + " create_quick_log.txt")
 
-                elif listitem.text == 'Principal Co-Consecrators:' and count_conse_found==1:
+                elif listitem.text == 'Principal Co-Consecrators:' and count_conse_found == 1:
                     firstlink = listitem.find('.//a[@href]')
                     firsthref = firstlink.attrib['href']
                     coconse_match = re.match('b([0-9a-z]+)\.html', firsthref)
@@ -97,7 +97,7 @@ for item in generator:
                         SUBQUERY_COCONSE = 'SELECT ?item WHERE { ?item wdt:P1047 "' + coconse_match.groups()[
                             0] + '". }'
                         subgenerator_coconse = pg.WikidataSPARQLPageGenerator(
-                        SUBQUERY_COCONSE, site=wikidata_site)
+                            SUBQUERY_COCONSE, site=wikidata_site)
                         count_coconse_found = 0
                         for item in subgenerator_coconse:
                             count_coconse_found += 1
@@ -106,7 +106,7 @@ for item in generator:
                                 print '!!! Co-Conse found: ' + conse_setter_id + ' => ' + conse_getter_id
                                 fq = open(path4qs, "a")
                                 fq.write("\n" + conse_getter_id +
-                                "\tP1598\t" + conse_setter_id + "\tP2868\tQ18442822")
+                                         "\tP1598\t" + conse_setter_id + "\tP2868\tQ18442822")
                                 fq.close()
                             elif count_conse_found == 0:
                                 print '-- checking ch.org for co-conse-info: ' + 'http://www.catholic-hierarchy.org/bishop/b' + conse_match.groups()[0] + '.html'
