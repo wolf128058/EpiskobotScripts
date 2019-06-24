@@ -10,7 +10,7 @@ import lxml.html
 
 
 QUERY = '''
-SELECT ?item ?itemLabel ?conse (COUNT(?conse) AS ?count) WHERE {
+SELECT ?item ?itemLabel (COUNT(?conse) AS ?count) WHERE {
   ?item wdt:P1047 ?catid;
     wdt:P1598 ?conse.
   FILTER(NOT EXISTS {
@@ -19,9 +19,8 @@ SELECT ?item ?itemLabel ?conse (COUNT(?conse) AS ?count) WHERE {
   })
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
-GROUP BY ?item ?itemLabel ?conse
+GROUP BY ?item ?itemLabel
 HAVING (?count = 1 )
-ORDER BY RAND()
 LIMIT 100
 '''
 
