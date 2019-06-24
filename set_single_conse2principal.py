@@ -13,7 +13,10 @@ QUERY = '''
 SELECT ?item ?itemLabel ?conse (COUNT(?conse) AS ?count) WHERE {
   ?item wdt:P1047 ?catid;
     wdt:P1598 ?conse.
-  FILTER(NOT EXISTS { ?conse pq:P2868 wd:Q18442817. })
+  FILTER(NOT EXISTS {
+    ?item p:P1598 ?func.
+    ?func pq:P2868 wd:Q18442817.
+  })
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
 GROUP BY ?item ?itemLabel ?conse
@@ -93,6 +96,10 @@ for item in generator:
                             q_as = pywikibot.Claim(repo, 'P2868', is_qualifier=True)
                             principal_claim = pywikibot.ItemPage(repo, u'Q18442817')
                             q_as.setTarget(principal_claim)
-                            claim_list_conse[0].addQualifier(q_as, summary=u'checked on catholic-hierarchy: this is the principal consecrator')
+                            try:
+                                claim_list_conse[0].addQualifier(q_as, summary=u'checked on catholic-hierarchy: this is the principal consecrator')
+                                print '--- Success!'
+                            except:
+                                continue
 
 print('Done!')
