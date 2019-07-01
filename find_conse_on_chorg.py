@@ -82,7 +82,7 @@ for item in generator:
                             print '!!! Conse found: ' + conse_setter_id + ' => ' + conse_getter_id
                             fq = open(path4qs, "a")
                             fq.write("\n" + conse_getter_id +
-                                     "\tP1598\t" + conse_setter_id + "\tP2868\tQ18442817")
+                                     "\tP1598\t" + conse_setter_id + "\tP3831\tQ18442817")
                             fq.close()
                         elif count_conse_found == 0:
                             print '-- checking ch.org for conse-info: ' + 'http://www.catholic-hierarchy.org/bishop/b' + conse_match.groups()[0] + '.html'
@@ -106,7 +106,7 @@ for item in generator:
                                 print '!!! Co-Conse found: ' + conse_setter_id + ' => ' + conse_getter_id
                                 fq = open(path4qs, "a")
                                 fq.write("\n" + conse_getter_id +
-                                         "\tP1598\t" + conse_setter_id + "\tP2868\tQ18442822")
+                                         "\tP1598\t" + conse_setter_id + "\tP3831\tQ18442822")
                                 fq.close()
                             elif count_conse_found == 0:
                                 print '-- checking ch.org for co-conse-info: ' + 'http://www.catholic-hierarchy.org/bishop/b' + conse_match.groups()[0] + '.html'

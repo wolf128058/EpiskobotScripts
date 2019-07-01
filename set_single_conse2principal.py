@@ -15,13 +15,13 @@ SELECT ?item ?itemLabel (COUNT(?conse) AS ?count) WHERE {
     wdt:P1598 ?conse.
   FILTER(NOT EXISTS {
     ?item p:P1598 ?func.
-    ?func pq:P2868 wd:Q18442817.
+    ?func pq:P3831 wd:Q18442817.
   })
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
 GROUP BY ?item ?itemLabel
 HAVING (?count = 1 )
-LIMIT 100
+# LIMIT 5000
 '''
 
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
@@ -92,7 +92,7 @@ for item in generator:
                         print '-- Principal-Conse found: ' + conse_setter_id + ' => ' + conse_getter_id
                         if conse_details.id == conse_setter_id:
                             print '~~~ That is correct. I will tag that as principal consecrator.'
-                            q_as = pywikibot.Claim(repo, 'P2868', is_qualifier=True)
+                            q_as = pywikibot.Claim(repo, 'P3831', is_qualifier=True)
                             principal_claim = pywikibot.ItemPage(repo, u'Q18442817')
                             q_as.setTarget(principal_claim)
                             try:
