@@ -8,17 +8,14 @@ import requests
 
 QUERY = """
 SELECT ?item ?itemLabel ?religion ?cathid WHERE {
-  ?item wdt:P140 wd:Q9592.
-  ?item wdt:P140 ?religion;
-    wdt:P1047 ?cathid;
-    wdt:P569 ?birth;
-
+  ?item wdt:P140 wd:Q9592, ?religion;
+    wdt:P1047 ?cathid.
+  OPTIONAL { ?item wdt:P569 ?birth. }
   FILTER(NOT EXISTS {
     ?item p:P140 _:b80.
     _:b80 ps:P140 ?relsub2;
       prov:wasDerivedFrom _:b30.
   })
-
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
 ORDER BY DESC (?birth)
