@@ -10,9 +10,8 @@ QUERY = """
 SELECT ?item ?itemLabel ?religion ?cathid ?rel2sub WHERE {
   ?item wdt:P39 wd:Q48629921;
     wdt:P140 wd:Q9592, ?religion;
-    wdt:P1047 ?cathid;
-    wdt:P569 ?birth.
-
+    wdt:P1047 ?cathid.
+  OPTIONAL { ?item wdt:P569 ?birth. }
   FILTER(NOT EXISTS {
     ?item p:P39 _:b80.
     _:b80 ps:P39 ?relsub2;
@@ -20,7 +19,6 @@ SELECT ?item ?itemLabel ?religion ?cathid ?rel2sub WHERE {
   })
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
-
 ORDER BY DESC (?birth)
 LIMIT 5000
 """
