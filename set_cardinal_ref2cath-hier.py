@@ -38,6 +38,7 @@ for item in generator:
     for cathids in claim_list_cathid:
         mycathid = cathids.getTarget()
         print(('>> Catholic-Hierarchy-Id: ' + mycathid))
+        print(('>> URL: https://www.wikidata.org/wiki/' + item.id))
 
     for rel_claim in claim_list_position:
         trgt = rel_claim.getTarget()
@@ -57,7 +58,7 @@ for item in generator:
                         continue
 
                     try:
-                        cardinal_tr = re.findall(r"\<tr\>\<td[^\>]+\>(.*)\<\/td\>\<td\>.*\<\/td\>\<td\>Elevated to Cardinal\<\/td\>.*\<\/tr\>", r.content)
+                        cardinal_tr = re.findall(r"\<td\>Elevated to Cardinal\<\/td\>", r.content)
                     except:
                         cardinal_tr = []
 
@@ -67,7 +68,7 @@ for item in generator:
                         source_claim.setTarget(mycathid)
                         rel_claim.addSources([source_claim], summary='add catholic-hierarchy as source for position cardinal')
                     else:
-                        print('-- No Priest-Ordination Data in table found. I skip.')
+                        print('-- No Cardinal-Elevation Data in table found. I skip.')
                         continue
                 changed = True
 
