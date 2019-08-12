@@ -18,8 +18,7 @@ SELECT ?item ?itemLabel ?cathid WHERE {
   })
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
-ORDER BY DESC (?birth)
-LIMIT 5'''
+ORDER BY DESC (?birth)'''
 
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
 
