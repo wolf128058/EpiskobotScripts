@@ -91,12 +91,21 @@ for item in generator:
                     if count_conse_found == 1:
                         print '-- Principal-Conse found: ' + conse_setter_id + ' => ' + conse_getter_id
                         if conse_details.id == conse_setter_id:
+
+                            try:
+                                if(len(claim_list_conse[0].qualifiers['P2868']) == 1):
+                                    myqual = claim_list_conse[0].qualifiers['P2868'][0]
+                                    print '-- Subject-Qualifier detected ... Removing'
+                                    claim_list_conse[0].removeQualifiers([myqual], summary=u'removed the principal consecrator via P2868')
+                            except:
+                                print '-- No wrong qualifier detected. Good boy!'
+
                             print '~~~ That is correct. I will tag that as principal consecrator.'
                             q_as = pywikibot.Claim(repo, 'P3831', is_qualifier=True)
                             principal_claim = pywikibot.ItemPage(repo, u'Q18442817')
                             q_as.setTarget(principal_claim)
                             try:
-                                claim_list_conse[0].addQualifier(q_as, summary=u'checked on catholic-hierarchy: this is the principal consecrator')
+                                claim_list_conse[0].addQualifier(q_as, summary=u'checked on catholic-hierarchy: this is the principal consecrator via P3831(!)')
                                 print '--- Success!'
                             except:
                                 continue
