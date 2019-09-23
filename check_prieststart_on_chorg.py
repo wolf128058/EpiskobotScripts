@@ -165,10 +165,9 @@ for item in generator:
                 if data_found == False:
                     print '- No valid ~ startdate (precision day) found: "' + priest_tr_circa[0].strip() + '"'
 
-    if(count_props % 10 == 0):
-        fq = open(path4qs, "a")
-        fq.write(item_properties)
-        fq.close()
-        item_properties = ''
+    fq = open(path4qs, "a")
+    fq.write(item_properties)
+    fq.close()
+    item_properties = ''
 
 print('Done!' + "\n")
