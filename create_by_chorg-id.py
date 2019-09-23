@@ -215,6 +215,15 @@ if r.status_code == 200:
         defline += "\nLAST\tLde\t\"" + item_label + "\""
         defline += "\nLAST\tLen\t\"" + item_label + "\""
 
+    elif mytitle.startswith('Patriarch '):
+        item_properties += "\nLAST\tP39\tQ171692\t"
+        defline += "\nLAST\tDde\t\"römisch-katholischer Patriarch\""
+        defline += "\nLAST\tDen\t\"roman-catholic patriarch\""
+        item_label = lreplace('Patriarch ', '', mytitle)
+        item_label = item_label.encode('utf8')
+        defline += "\nLAST\tLde\t\"" + item_label + "\""
+        defline += "\nLAST\tLen\t\"" + item_label + "\""
+
     else:
         quit()
 
