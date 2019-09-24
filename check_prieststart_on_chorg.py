@@ -106,7 +106,7 @@ for item in generator:
             try:
                 if data_found == False:
                     prieststart_datetime = datetime.strptime(priest_tr.strip(), '%d %b %Y')
-                    item_properties += "\n" + mywd_id + "\tP106\tQ250867\tP580\t+" + prieststart_datetime.isoformat() + 'Z/11'
+                    item_properties += "\n" + mywd_id + "\tP106\tQ250867\tP580\t+" + prieststart_datetime.isoformat() + 'Z/11' + "\tS1047\t\"" + mycathid + "\"\t"
                     count_props += 1
                     data_found = True
             except:
@@ -116,7 +116,7 @@ for item in generator:
             try:
                 if data_found == False:
                     prieststart_datetime = datetime.strptime(priest_tr.strip(), '%b %Y')
-                    item_properties += "\n" + mywd_id + "\tP106\tQ250867\tP580\t+" + prieststart_datetime.isoformat() + 'Z/10'
+                    item_properties += "\n" + mywd_id + "\tP106\tQ250867\tP580\t+" + prieststart_datetime.isoformat() + 'Z/10' + "\tS1047\t\"" + mycathid + "\"\t"
                     count_props += 1
                     data_found = True
             except:
@@ -126,7 +126,7 @@ for item in generator:
             try:
                 if data_found == False:
                     prieststart_datetime = datetime.strptime(priest_tr.strip(), '%Y')
-                    item_properties += "\n" + mywd_id + "\tP106\tQ250867\tP580\t+" + prieststart_datetime.isoformat() + 'Z/9'
+                    item_properties += "\n" + mywd_id + "\tP106\tQ250867\tP580\t+" + prieststart_datetime.isoformat() + 'Z/9' + "\tS1047\t\"" + mycathid + "\"\t"
                     count_props += 1
             except:
                 if data_found == False:
@@ -138,7 +138,7 @@ for item in generator:
             try:
                 if data_found == False:
                     prieststart_datetime = datetime.strptime(priest_tr_circa[0].strip(), '%d %b %Y')
-                    item_properties += "\n" + mywd_id + "\tP106\tQ250867\tP580\t+" + prieststart_datetime.isoformat() + 'Z/11' + "\tP1480\tQ5727902"
+                    item_properties += "\n" + mywd_id + "\tP106\tQ250867\tP580\t+" + prieststart_datetime.isoformat() + 'Z/11' + "\tP1480\tQ5727902" + "\tS1047\t\"" + mycathid + "\"\t"
                     count_props += 1
                     data_found = True
             except:
@@ -148,7 +148,7 @@ for item in generator:
             try:
                 if data_found == False:
                     prieststart_datetime = datetime.strptime(priest_tr_circa[0].strip(), '%b %Y')
-                    item_properties += "\n" + mywd_id + "\tP106\tQ250867\tP580\t+" + prieststart_datetime.isoformat() + 'Z/10' + "\tP1480\tQ5727902"
+                    item_properties += "\n" + mywd_id + "\tP106\tQ250867\tP580\t+" + prieststart_datetime.isoformat() + 'Z/10' + "\tP1480\tQ5727902" + "\tS1047\t\"" + mycathid + "\"\t"
                     count_props += 1
                     data_found = True
             except:
@@ -158,7 +158,7 @@ for item in generator:
             try:
                 if data_found == False:
                     prieststart_datetime = datetime.strptime(priest_tr_circa[0].strip(), '%Y')
-                    item_properties += "\n" + mywd_id + "\tP106\tQ250867\tP580\t+" + prieststart_datetime.isoformat() + 'Z/9' + "\tP1480\tQ5727902"
+                    item_properties += "\n" + mywd_id + "\tP106\tQ250867\tP580\t+" + prieststart_datetime.isoformat() + 'Z/9' + "\tP1480\tQ5727902" + "\tS1047\t\"" + mycathid + "\"\t"
                     count_props += 1
                     data_found = True
             except:

@@ -63,7 +63,7 @@ if r.status_code == 200:
 # CHECK SOURCE FOR DATES
     priest_tr = re.findall(r"\<tr\>.*\<td\>Ordained Priest\<\/td\>.*\<\/tr\>", source)
     if len(priest_tr) > 0:
-        item_properties += "\nLAST\tP106\tQ250867"
+        item_properties += "\nLAST\tP106\tQ250867\tS1047\t\"" + mycathid + "\"\t"
 
 # BIRTHDATE
     birth_datetime = None
@@ -174,7 +174,7 @@ if r.status_code == 200:
     mytitle = mytitle.strip()
 
     if mytitle.startswith('Bishop '):
-        item_properties += "\nLAST\tP39\tQ611644\t"
+        item_properties += "\nLAST\tP39\tQ611644\tS1047\t\"" + mycathid + "\"\t"
         defline += "\nLAST\tDde\t\"römisch-katholischer Bischof\""
         defline += "\nLAST\tDen\t\"roman-catholic bishop\""
         defline += "\nLAST\tDit\t\"vescovo cattolico\""
@@ -203,7 +203,7 @@ if r.status_code == 200:
         defline += "\nLAST\tLen\t\"" + item_label + "\""
 
     elif mytitle.startswith('Archbishop '):
-        item_properties += "\nLAST\tP39\tQ48629921\t"
+        item_properties += "\nLAST\tP39\tQ48629921\tS1047\t\"" + mycathid + "\"\t"
         defline += "\nLAST\tDde\t\"römisch-katholischer Erzbischof\""
         defline += "\nLAST\tDen\t\"roman-catholic archbishop\""
         defline += "\nLAST\tDit\t\"arcivescovo cattolico\""

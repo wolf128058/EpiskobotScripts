@@ -165,6 +165,8 @@ for item in generator:
                 if (mydiowd != False and mydiowd != None):
                     if len(l_tbishop) == 1:
                         item_properties += "\n" + mywd_id + "\tP39\tQ948657\tP708\t" + mydiowd
+                        item_properties += "\tS1047\t\"" + mycathid + "\"\t"
+
                     else:
                         new_claim = pywikibot.Claim(repo, 'P39')
                         target_tb = pywikibot.ItemPage(repo, 'Q948657')
