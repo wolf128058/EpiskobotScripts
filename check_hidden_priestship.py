@@ -18,7 +18,6 @@ SELECT ?item ?itemLabel ?birthLabel ?cathiLabel ?jobLabel WHERE {
   FILTER(NOT EXISTS { ?item wdt:P106 wd:Q250867. })
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
-LIMIT 5000
 """
 
 path4qs = 'log_quick_hiddenpriestships.txt'
