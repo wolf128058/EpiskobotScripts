@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import pywikibot
@@ -7,6 +7,28 @@ from pywikibot import pagegenerators as pg
 import lxml.html
 import re
 import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+
+
+def requests_retry_session(
+    retries=5,
+    backoff_factor=0.3,
+    status_forcelist=(500, 502, 504),
+    session=None,
+):
+    session = session or requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
 
 
 def dioid2wd(dioid):
@@ -60,19 +82,20 @@ for item in generator:
         chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
         print('-- Catholic-Hierarchy-URL: ' + chorgurl)
 
-        r = requests.get(chorgurl, timeout=10)
+        # r = requests.get(chorgurl, timeout=10)
+        r = requests_retry_session().get(chorgurl)
         if r.status_code != 200:
-            print('### HTTP-ERROR ON cath-id: ' + chorgurl)
+            print(('### HTTP-ERROR ON cath-id: ' + chorgurl))
             continue
-        aux_bishopship_tr = re.findall(r"\<tr\>\<td[^\>]+\>.*\<\/td\>\<td\>.*\<\/td\>\<td\>Auxiliary Bishop of (.*)\<\/td\>.*\<\/tr\>", r.content)
+        aux_bishopship_tr = re.findall(b'<tr><td[^>]+>.*</td><td>.*</td><td>Auxiliary Bishop of (.*)</td>.*</tr>', r.content)
 
         l_auxbishop = []
 
         if len(aux_bishopship_tr) > 0:
             for x in range(0, len(aux_bishopship_tr)):
-                dioceseid = re.findall(r'href="\/diocese\/d([a-z0-9]+).html"', aux_bishopship_tr[x])
+                dioceseid = re.findall(b'href="/diocese/d([a-z0-9]+).html"', aux_bishopship_tr[x])
                 if(len(dioceseid) > 0):
-                    l_auxbishop.append(dioceseid[0])
+                    l_auxbishop.append(dioceseid[0].decode('utf-8'))
             l_auxbishop = list(set(l_auxbishop))
             print('-- Diocesan-Bishopship-Info: ' + ', '.join(l_auxbishop))
 
