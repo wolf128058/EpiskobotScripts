@@ -16,11 +16,11 @@ def dioid2wd(dioid):
         generator = pg.WikidataSPARQLPageGenerator(QUERY4DIOID, site=wikidata_site)
         for item in generator:
             mywd = item.get()
-            print '--- WD-Item-4-Diocese found: ' + item.id
+            print('--- WD-Item-4-Diocese found: ' + item.id)
             return item.id
 
     except:
-        print '!!! query for diocese failed.'
+        print('!!! query for diocese failed.')
         return False
 
 
@@ -46,8 +46,8 @@ count_props = 0
 for item in generator:
     mywd = item.get()
     mywd_id = item.id
-    print "\n" + '>> Checking WD-ID: ' + mywd_id
-    print '-- WD-URL: https://www.wikidata.org/wiki/' + mywd_id
+    print("\n" + '>> Checking WD-ID: ' + mywd_id)
+    print('-- WD-URL: https://www.wikidata.org/wiki/' + mywd_id)
 
     claim_list_pos = {}
     my_cathbishop_claim = {}
@@ -56,13 +56,13 @@ for item in generator:
     claim_list_cathid = mywd['claims']['P1047']
     for cathids in claim_list_cathid:
         mycathid = cathids.getTarget()
-        print '-- Catholic-Hierarchy-Id: ' + mycathid
+        print('-- Catholic-Hierarchy-Id: ' + mycathid)
         chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
-        print '-- Catholic-Hierarchy-URL: ' + chorgurl
+        print('-- Catholic-Hierarchy-URL: ' + chorgurl)
 
         r = requests.get(chorgurl, timeout=10)
         if r.status_code != 200:
-            print '### HTTP-ERROR ON cath-id: ' + chorgurl
+            print('### HTTP-ERROR ON cath-id: ' + chorgurl)
             continue
         aux_bishopship_tr = re.findall(r"\<tr\>\<td[^\>]+\>.*\<\/td\>\<td\>.*\<\/td\>\<td\>Auxiliary Bishop of (.*)\<\/td\>.*\<\/tr\>", r.content)
 
@@ -74,7 +74,7 @@ for item in generator:
                 if(len(dioceseid) > 0):
                     l_auxbishop.append(dioceseid[0])
             l_auxbishop = list(set(l_auxbishop))
-            print '-- Diocesan-Bishopship-Info: ' + ', '.join(l_auxbishop)
+            print('-- Diocesan-Bishopship-Info: ' + ', '.join(l_auxbishop))
 
             try:
                 claim_list_currentpositions = mywd['claims']['P39']
@@ -89,7 +89,7 @@ for item in generator:
                     l_known_auxbishopships.append(single_pos)
 
             if (len(l_known_auxbishopships) > 0):
-                print('-- Found {} Job-Claims for aux-bishopships'.format(len(l_known_auxbishopships)))
+                print(('-- Found {} Job-Claims for aux-bishopships'.format(len(l_known_auxbishopships))))
 
             for dbishop in l_auxbishop:
                 mydiowd = dioid2wd(dbishop)
@@ -131,4 +131,4 @@ for item in generator:
         fq.close()
         item_properties = ''
 
-print('Done!' + "\n")
+print(('Done!' + "\n"))
