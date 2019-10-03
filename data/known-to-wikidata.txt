@@ -3210,6 +3210,7 @@ benedgi
 benedgl
 benedicv
 benediii
+benediv
 benedp
 beneds
 benedsi
@@ -4323,6 +4324,7 @@ bonifacv
 bonifaz
 bonifiga
 bonifp
+bonifvi
 boniho
 bonilla
 bonillam
@@ -8577,6 +8579,7 @@ consoli
 consolig
 consolim
 consp
+constan
 constand
 constant
 constg
@@ -12714,6 +12717,7 @@ etter
 etto
 ettore
 eudae
+eugeneii
 eugenin
 eula
 eulate
@@ -13969,6 +13973,7 @@ formba
 formbac
 formg
 formi
+formosus
 forna
 fornari
 fornarif
@@ -15650,6 +15655,7 @@ giovani
 giovann
 giove
 giovf
+gioviii
 giovine
 giovio
 gioviog
@@ -16526,6 +16532,9 @@ greger
 gregg
 greggi
 gregh
+gregii
+gregiii
+gregiv
 gregma
 grego
 gregoire
@@ -18791,6 +18800,7 @@ johannan
 johannes
 johannis
 johannp
+johnix
 johnson
 johnsonm
 johnst
@@ -20927,6 +20937,8 @@ leoam
 leoca
 leod
 leofanti
+leoiii
+leoiv
 leoj
 leon
 leona
@@ -23137,6 +23149,7 @@ marinma
 marino
 marinoa
 marinoc
+marinoi
 marinoj
 marinoni
 marinos
@@ -26369,6 +26382,7 @@ niccoi
 niccola
 niccolai
 niccoli
+niccolo
 nich
 nichesgh
 nicheso
@@ -28070,6 +28084,7 @@ paolib
 paolii
 paolim
 paolis
+paolo
 paolu
 paoluf
 pap
@@ -28271,6 +28286,7 @@ pasqua
 pasquad
 pasquala
 pasquald
+pasquale
 pasqualg
 pasquali
 pasqualm
@@ -31949,6 +31965,7 @@ romj
 romja
 romka
 romlem
+romnop
 romo
 romog
 romoga
@@ -34291,6 +34308,7 @@ serg
 sergar
 sergio
 sergiu
+sergiuii
 sergius
 sergrda
 serguid
@@ -34844,6 +34862,7 @@ siscarg
 sisdob
 sise
 sisi
+sisin
 sisinni
 sisl
 sism
@@ -35656,9 +35675,14 @@ stefano
 stefanol
 stefanor
 stefanou
+stefanvi
 stefas
 steff
+stefii
+stefiii
+stefiv
 stefs
+stefv
 steg
 stegm
 stehle
@@ -36563,6 +36587,7 @@ teodg
 teodino
 teodolo
 teodori
+teodoro
 teofil
 teofila
 teofili
@@ -37983,6 +38008,7 @@ valentig
 valentin
 valentir
 valentis
+valentn
 valentnv
 valentp
 valents
@@ -40153,6 +40179,7 @@ zabok
 zaca
 zacal
 zacc
+zaccaria
 zaccg
 zaccga
 zacch
