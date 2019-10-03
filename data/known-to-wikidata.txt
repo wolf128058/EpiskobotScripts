@@ -1017,6 +1017,7 @@ anand
 anandj
 anania
 anap
+anast
 anasta
 anastal
 anathil
@@ -3197,6 +3198,7 @@ bencomo
 benda
 bende
 bendico
+bendt
 bendttc
 benec
 bened
@@ -3206,6 +3208,7 @@ benedbe
 benedg
 benedgi
 benedgl
+benedicv
 benediii
 benedp
 beneds
@@ -3216,6 +3219,7 @@ benelli
 benepc
 benesc
 benet
+beneto
 benets
 benett
 benev
@@ -6122,6 +6126,7 @@ canecin
 caned
 canell
 canelo
+canep
 canepa
 canes
 canessa
@@ -15641,6 +15646,7 @@ giov
 giovan
 giovanbi
 giovangi
+giovani
 giovann
 giove
 giovf
@@ -15649,6 +15655,8 @@ giovio
 gioviog
 gioviop
 gioviopg
+giovni
+giovnni
 giovo
 giovp
 gira
@@ -20256,6 +20264,7 @@ lando
 landof
 landofil
 landolfi
+landon
 landore
 landr
 landrf
@@ -20877,6 +20886,7 @@ lencv
 lencz
 lend
 lenda
+lene
 lenes
 lenfang
 lenfant
@@ -20939,6 +20949,7 @@ leonegf
 leonegir
 leonel
 leonem
+leonep
 leonepi
 leonetti
 leonev
@@ -20970,6 +20981,8 @@ leopoli
 leopp
 leops
 leos
+leov
+leoviii
 leow
 lepa
 lepai
@@ -23183,6 +23196,7 @@ marnas
 marnavi
 marnays
 marnjt
+marno
 marnr
 maro
 maroce
@@ -27629,6 +27643,7 @@ ott
 otta
 ottaa
 ottai
+ottav
 otte
 otteh
 ottg
@@ -31853,6 +31868,7 @@ rol
 rola
 rolan
 roland
+rolando
 roldan
 roldanb
 role
@@ -31860,6 +31876,7 @@ rolfi
 rolgue
 roli
 rolim
+rolin
 rolinge
 rolinj
 rolinje
@@ -34273,6 +34290,7 @@ serfri
 serg
 sergar
 sergio
+sergiu
 sergius
 sergrda
 serguid
@@ -35634,6 +35652,7 @@ stefanel
 stefanes
 stefange
 stefani
+stefano
 stefanol
 stefanor
 stefanou
@@ -35729,6 +35748,7 @@ stewartt
 stewartw
 stewe
 stey
+stfano
 stge
 stgeran
 stgerm
@@ -40184,6 +40204,7 @@ zaky
 zala
 zalah
 zalat
+zaldua
 zales
 zaleski
 zaleskil
