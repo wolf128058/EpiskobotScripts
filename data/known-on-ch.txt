@@ -5,6 +5,7 @@ abaa
 abad
 abada
 abadir
+pinfar
 abadl
 abadla
 abaga
@@ -15,6 +16,7 @@ abanto
 abaran
 abarca
 abarquez
+duignan
 abascal
 abasolo
 abati
@@ -40869,4 +40871,3 @@ zyl
 zyroslaw
 zywiec
 zziwa
-
