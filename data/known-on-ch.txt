@@ -2498,6 +2498,7 @@ barbsoa
 barbu
 barbuh
 barc
+barcai
 barcam
 barci
 barcia
@@ -26344,6 +26345,7 @@ neideck
 neila
 neirac
 nelis
+nellaip
 nellen
 nelligan
 nellik
@@ -38106,7 +38108,6 @@ vaan
 vaar
 vabe
 vaca
-vacant
 vacasg
 vacc
 vacca
@@ -38401,6 +38402,7 @@ vard
 varda
 vardaii
 vardaip
+varden
 vare
 varei
 varela
@@ -40867,3 +40869,4 @@ zyl
 zyroslaw
 zywiec
 zziwa
+
