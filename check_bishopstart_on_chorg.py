@@ -7,10 +7,35 @@ from pywikibot import pagegenerators as pg
 import datetime
 from datetime import datetime
 
+from random import shuffle
+
+import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+
 import lxml.html
 import re
-import requests
 import progressbar
+
+
+def requests_retry_session(
+    retries=5,
+    backoff_factor=0.3,
+    status_forcelist=(500, 502, 504),
+    session=None,
+):
+    session = session or requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
 
 
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
@@ -22,19 +47,17 @@ SELECT ?item ?itemLabel ?birthLabel ?cathid WHERE {
   OPTIONAL { ?item wdt:P569 ?birth. }
   FILTER(NOT EXISTS { ?position pq:P580 ?start. })
   FILTER(EXISTS { ?item p:P1047 ?statement. })
-  FILTER((YEAR(?birth)) >= 1554 )
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
-ORDER BY DESC (?birthLabel)
-LIMIT 5000
 """
 path4qs = 'log_quick_bishopstarts.txt'
 generator = pg.WikidataSPARQLPageGenerator(QUERY_WITHOUT_START, site=wikidata_site)
 generator = list(generator)
+shuffle(generator)
 item_properties = ''
 count_props = 0
 
 with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
+    bar.update(0)
     for index, item in enumerate(generator):
         mywd = item.get()
         mywd_id = item.id
@@ -78,7 +101,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
             print('-- Catholic-Hierarchy-URL: ' + chorgurl)
 
-            r = requests.get(chorgurl)
+            r = requests_retry_session().get(chorgurl)
             if r.status_code != 200:
                 print('### HTTP-ERROR ON cath-id: ' + chorgurl)
                 continue
@@ -119,7 +142,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                             item_properties += "\n" + mywd_id + "\tP39\tQ611644\tP580\t+" + bishopstart_datetime.isoformat() + 'Z/9' + "\tS1047\t\"" + mycathid + "\"\t"
                             count_props += 1
                         except:
-                            print('- No valid startdate (precision year) found: "' + priest_tr + '"')
+                            print('- No valid startdate (precision year) found: "' + bishop_tr_clean + '"')
 
             else:
                 try:
