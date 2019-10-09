@@ -1,10 +1,17 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
+import progressbar
+import re
 
 import pywikibot
 from pywikibot import pagegenerators as pg
+
 import requests
-import re
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+
+from random import shuffle
 
 QUERY = '''
 SELECT ?item ?itemLabel ?cathid WHERE {
@@ -22,30 +29,30 @@ ORDER BY DESC (?birth)'''
 
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
 
-# print(QUERY)
-
 generator = pg.WikidataSPARQLPageGenerator(QUERY, site=wikidata_site)
+generator = list(generator)
+shuffle(generator)
+
 repo = wikidata_site.data_repository()
 
-for item in generator:
-    itemdetails = item.get()
-    mycathid = ''
-    changed = False
+with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
+    bar.update(0)
+    for index, item in enumerate(generator):
+        itemdetails = item.get()
+        mycathid = ''
 
-    claim_list_position = itemdetails['claims']['P39']
-    claim_list_cathid = itemdetails['claims']['P1047']
+        claim_list_position = itemdetails['claims']['P39']
+        claim_list_cathid = itemdetails['claims']['P1047']
 
-    for cathids in claim_list_cathid:
-        mycathid = cathids.getTarget()
-        print(('>> Catholic-Hierarchy-Id: ' + mycathid))
-        print(('>> URL: https://www.wikidata.org/wiki/' + item.id))
+        for cathids in claim_list_cathid:
+            mycathid = cathids.getTarget()
+            print('>> Catholic-Hierarchy-Id: ' + mycathid)
+            print('>> URL: https://www.wikidata.org/wiki/' + item.id)
 
-    for rel_claim in claim_list_position:
-        trgt = rel_claim.getTarget()
-        print(('-- Claim for {} found.'.format(trgt.id)))
-        if trgt.id == 'Q45722':
-
-            if changed == False:
+        for rel_claim in claim_list_position:
+            trgt = rel_claim.getTarget()
+            print('-- Claim for {} found.'.format(trgt.id))
+            if trgt.id == 'Q45722':
 
                 rel_claim_sources = rel_claim.getSources()
 
@@ -54,22 +61,21 @@ for item in generator:
                     r = requests.get(chorgurl)
 
                     if r.status_code != 200:
-                        print(('### HTTP-ERROR ON cath-id: ' + chorgurl))
+                        print('### HTTP-ERROR ON cath-id: ' + chorgurl)
                         continue
 
                     try:
-                        cardinal_tr = re.findall(r"\<td\>Elevated to Cardinal\<\/td\>", r.content)
+                        cardinal_tr = re.findall(b"<td>Elevated to Cardinal</td>", r.content)
                     except:
                         cardinal_tr = []
 
                     if len(cardinal_tr) > 0:
-                        print(('-- Cardinal-Info: ' + cardinal_tr[0]))
+                        print('-- Cardinal-Info: ' + cardinal_tr[0].decode('utf-8'))
                         source_claim = pywikibot.Claim(repo, 'P1047')
                         source_claim.setTarget(mycathid)
                         rel_claim.addSources([source_claim], summary='add catholic-hierarchy as source for position cardinal')
                     else:
                         print('-- No Cardinal-Elevation Data in table found. I skip.')
                         continue
-                changed = True
-
+        bar.update(index)
 print('Done!')
