@@ -33,13 +33,17 @@ def requests_retry_session(
     return session
 
 
-QUERY = """
-SELECT ?item WHERE {
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
-  ?item wdt:P1047 ?Katholische_Hierarchie_Personen_ID.
-  ?item wdt:P140 wd:Q9592.
+QUERY = '''
+SELECT ?item ?itemLabel ?religion ?cathid WHERE {
+  ?item wdt:P140 wd:Q9592, ?religion;
+    wdt:P1047 ?cathid.
+  FILTER(NOT EXISTS {
+    ?item p:P140 _:b80.
+    _:b80 ps:P140 ?relsub2;
+      prov:wasDerivedFrom _:b30.
+  })
 }
-"""
+'''
 
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
 
@@ -50,6 +54,7 @@ shuffle(generator)
 repo = wikidata_site.data_repository()
 
 with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
+    bar.update(0)
     for index, item in enumerate(generator):
         itemdetails = item.get()
         mycathid = ''
@@ -64,12 +69,14 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             mycathid = cathids.getTarget()
             chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
             print('-- Catholic-Hierarchy-Id: ' + mycathid)
+            print('-- URL: ' + chorgurl)
 
         for rel_claim in claim_list_religion:
             trgt = rel_claim.getTarget()
-            print(('-- Claim for {} found.'.format(trgt.id)))
+            print('-- Claim for {} found.'.format(trgt.id))
             if trgt.id == 'Q9592':
                 rel_claim_sources = rel_claim.getSources()
+
                 if len(rel_claim_sources) == 0:
                     r = requests_retry_session().head(chorgurl)
                     if r.status_code == 200:
@@ -95,4 +102,5 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                             source_claim.setTarget(mycathid)
                             rel_claim.addSources([source_claim], summary='add catholic-hierarchy as source for religion')
         bar.update(index)
+
 print('Done!')
