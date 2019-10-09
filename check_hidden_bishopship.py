@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+import re
+import progressbar
+
 import pywikibot
 from pywikibot import pagegenerators as pg
 
@@ -9,8 +12,8 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 import lxml.html
-import re
-import progressbar
+
+from random import shuffle
 
 
 def requests_retry_session(
@@ -40,7 +43,7 @@ def dioid2wd(dioid):
         generator = pg.WikidataSPARQLPageGenerator(QUERY4DIOID, site=wikidata_site)
         for item in generator:
             mywd = item.get()
-            print(('--- WD-Item-4-Diocese found: ' + item.id))
+            print('--- WD-Item-4-Diocese found: ' + item.id)
             return item.id
 
     except:
@@ -49,23 +52,20 @@ def dioid2wd(dioid):
 
 
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
-QUERY_WITHOUT_START = """
-SELECT ?item ?itemLabel ?birthLabel ?cathiLabel WHERE {
+QUERY_WITHOUT_START = '''
+SELECT ?item WHERE {
   ?item wdt:P1047 ?cathi;
-    wdt:P39 ?position.
-  OPTIONAL { ?item wdt:P569 ?birth. }
-  FILTER(NOT EXISTS { ?item wdt:P39 wd:Q1144278. })
-  FILTER(NOT EXISTS { ?item wdt:P39 wd:Q65924966. })
-  FILTER(NOT EXISTS { ?item wdt:P39 wd:Q948657. })
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
+    wdt:P39 ?position
+# FILTER( ?position NOT IN (wd:Q48629921, wd:Q50362553) )
+ FILTER( ?position NOT IN (wd:Q65924966) )
 }
-GROUP BY ?item ?itemLabel ?birthLabel ?cathiLabel
-LIMIT 10000
-"""
+GROUP BY (?item)
+'''
 
 path4qs = 'log_quick_hiddenbishopships.txt'
 generator = pg.WikidataSPARQLPageGenerator(QUERY_WITHOUT_START, site=wikidata_site)
 generator = list(generator)
+shuffle(generator)
 repo = wikidata_site.data_repository()
 item_properties = ''
 count_props = 0
@@ -85,13 +85,13 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
         claim_list_cathid = mywd['claims']['P1047']
         for cathids in claim_list_cathid:
             mycathid = cathids.getTarget()
-            print(('-- Catholic-Hierarchy-Id: ' + mycathid))
+            print('-- Catholic-Hierarchy-Id: ' + mycathid)
             chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
-            print(('-- Catholic-Hierarchy-URL: ' + chorgurl))
+            print('-- Catholic-Hierarchy-URL: ' + chorgurl)
 
             r = requests_retry_session().get(chorgurl)
             if r.status_code != 200:
-                print(('### HTTP-ERROR ON cath-id: ' + chorgurl))
+                print('### HTTP-ERROR ON cath-id: ' + chorgurl)
                 continue
             diocesan_bishopship_tr = re.findall(b"<tr><td[^>]+>.*</td><td>.*</td><td>Bishop of (.*)</td>.*</tr>", r.content)
             titular_bishopship_tr = re.findall(b"<tr><td[^>]+>.*\</td><td>.*</td><td>Titular Bishop of (.*)</td>.*</tr>", r.content)
@@ -102,7 +102,11 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             l_known_dbishopships = []
             l_known_tbishopships = []
 
-            claim_list_currentpositions = mywd['claims']['P39']
+            try:
+                claim_list_currentpositions = mywd['claims']['P39']
+            except:
+                print('### Job-Claim-Check failed!')
+                continue
 
             for single_pos in claim_list_currentpositions:
                 trgt_pos = single_pos.getTarget()
@@ -111,19 +115,19 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                 elif trgt_pos.id == 'Q948657':
                     l_known_tbishopships.append(single_pos)
 
+                if (len(l_known_dbishopships) > 0):
+                    print('-- Found {} Job-Claims for diocesan bishopships'.format(len(l_known_dbishopships)))
+
+                if (len(l_known_tbishopships) > 0):
+                    print('-- Found {} Job-Claims for titular bishopships'.format(len(l_known_dbishopships)))
+
             if len(diocesan_bishopship_tr) > 0:
                 for x in range(0, len(diocesan_bishopship_tr)):
                     dioceseid = re.findall(b'href="/diocese/d([a-z0-9]+).html"', diocesan_bishopship_tr[x])
                     if(len(dioceseid) > 0):
                         l_dbishop.append(dioceseid[0].decode('utf-8'))
                 l_dbishop = list(set(l_dbishop))
-                print(('-- Diocesan-Bishopship-Info: ' + ', '.join(l_dbishop)))
-
-                if (len(l_known_dbishopships) > 0):
-                    print(('-- Found {} Job-Claims for diocesan bishopships'.format(len(l_known_dbishopships))))
-
-                if (len(l_known_tbishopships) > 0):
-                    print(('-- Found {} Job-Claims for titular bishopships'.format(len(l_known_dbishopships))))
+                print('-- Diocesan-Bishopship-Info: ' + ', '.join(l_dbishop))
 
                 for dbishop in l_dbishop:
                     mydiowd = dioid2wd(dbishop)
@@ -139,7 +143,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                         diozese_claim = a_qualis['P708'][0]
                         trgt_d = diozese_claim.getTarget()
                         if (trgt_d.id == mydiowd):
-                            print('-- Found diocesan bishopship without already known and matching Diozese-Claim.')
+                            print('-- Found diocesan bishopship with already known and matching Diozese-Claim.')
                             known_a2d = True
                             continue
 
@@ -167,7 +171,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                         l_tbishop.append(dioceseid[0].decode('utf-8'))
 
                 l_tbishop = list(set(l_tbishop))
-                print(('-- Titular-Arch-Bishopship-Info: ' + ', '.join(l_tbishop)))
+                print('-- Titular-Arch-Bishopship-Info: ' + ', '.join(l_tbishop))
                 for tbishop in l_tbishop:
                     mydiowd = dioid2wd(tbishop)
 
@@ -183,7 +187,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                         diozese_claim = a_qualis['P708'][0]
                         trgt_d = diozese_claim.getTarget()
                         if (trgt_d.id == mydiowd):
-                            print('-- Found titular-bishopship without already known and matching Diozese-Claim.')
+                            print('-- Found titular-bishopship with already known and matching Diozese-Claim.')
                             known_t2d = True
                             continue
 
@@ -204,6 +208,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                             new_claim.setTarget(target_tb)
                             new_claim.addQualifier(target_dioclaim)
                             item.addClaim(new_claim, summary='added titular-bishopship-claim')
+
             bar.update(index)
             fq = open(path4qs, "a")
             fq.write(item_properties)
