@@ -7,13 +7,14 @@ from pywikibot import pagegenerators as pg
 import datetime
 from datetime import datetime
 
+from random import shuffle
+
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
 import lxml.html
 import re
-import json
 import progressbar
 
 
@@ -46,14 +47,12 @@ SELECT ?item ?itemLabel ?birthLabel ?cathid WHERE {
   OPTIONAL { ?item wdt:P569 ?birth. }
   FILTER(NOT EXISTS { ?job pq:P580 ?start. })
   FILTER(EXISTS { ?item p:P1047 ?statement. })
-  FILTER((YEAR(?birth)) >= 1584 )
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
-ORDER BY (?birthLabel)
 """
 path4qs = 'log_quick_prieststarts.txt'
 generator = pg.WikidataSPARQLPageGenerator(QUERY_WITHOUT_START, site=wikidata_site)
 generator = list(generator)
+shuffle(generator)
 item_properties = ''
 count_props = 0
 
@@ -192,4 +191,4 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
         fq.close()
         item_properties = ''
 
-print(('Done!' + "\n"))
+print('Done!' + "\n")
