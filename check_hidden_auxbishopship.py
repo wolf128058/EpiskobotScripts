@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+import re
+import progressbar
+
 import pywikibot
 from pywikibot import pagegenerators as pg
 
@@ -8,8 +11,9 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-import progressbar
-import re
+import lxml.html
+
+from random import shuffle
 
 
 def requests_retry_session(
@@ -62,12 +66,13 @@ LIMIT 50000
 path4qs = 'log_quick_hiddenauxbishopships.txt'
 generator = pg.WikidataSPARQLPageGenerator(QUERY_WITHOUT_START, site=wikidata_site)
 generator = list(generator)
-
+shuffle(generator)
 repo = wikidata_site.data_repository()
 item_properties = ''
 count_props = 0
 
 with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
+    bar.update(0)
     for index, item in enumerate(generator):
         mywd = item.get()
         mywd_id = item.id
@@ -87,7 +92,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
 
             r = requests_retry_session().get(chorgurl)
             if r.status_code != 200:
-                print(('### HTTP-ERROR ON cath-id: ' + chorgurl))
+                print('### HTTP-ERROR ON cath-id: ' + chorgurl)
                 continue
             aux_bishopship_tr = re.findall(b'<tr><td[^>]+>.*</td><td>.*</td><td>Auxiliary Bishop of (.*)</td>.*</tr>', r.content)
 
@@ -114,7 +119,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                         l_known_auxbishopships.append(single_pos)
 
                 if (len(l_known_auxbishopships) > 0):
-                    print(('-- Found {} Job-Claims for aux-bishopships'.format(len(l_known_auxbishopships))))
+                    print('-- Found {} Job-Claims for aux-bishopships'.format(len(l_known_auxbishopships)))
 
                 for dbishop in l_auxbishop:
                     mydiowd = dioid2wd(dbishop)
