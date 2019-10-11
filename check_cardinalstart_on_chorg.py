@@ -96,13 +96,12 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
         for cathids in claim_list_cathid:
             data_found = False
             cardinal_tr_circa = []
-            cardinal_tr = []
             mycathid = cathids.getTarget()
             print('-- Catholic-Hierarchy-Id: ' + mycathid)
             chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
             print('-- Catholic-Hierarchy-URL: ' + chorgurl)
 
-            r = requests.get(chorgurl)
+            r = requests_retry_session().get(chorgurl)
             if r.status_code != 200:
                 print('### HTTP-ERROR ON cath-id: ' + chorgurl)
                 continue
@@ -112,14 +111,14 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             except:
                 cardinal_tr = []
 
-            if len(cardinal_tr) > 0:
-                print('-- cardinal-Info: ' + cardinal_tr[0])
-                cardinal_tr = re.sub(r'\<[^\<]+>', '', cardinal_tr[0])
+            if cardinal_tr:
+                print('-- Cardinal-Info: ' + cardinal_tr[0].decode('utf-8'))
+                cardinal_tr = re.sub(r'\<[^\<]+>', '', cardinal_tr[0].decode('utf-8'))
                 cardinal_tr_circa = re.findall(r"(.*)&", cardinal_tr.strip())
             else:
-                print('-- No cardinal-Ordination Data in table found. I skip.')
+                print('-- No Cardinal-Ordination Data in table found. I skip.')
 
-            if len(cardinal_tr_circa) == 0 and len(cardinal_tr) > 0:
+            if not cardinal_tr_circa and cardinal_tr:
                 print('-- There is nice data as precise data.')
 
                 try:
