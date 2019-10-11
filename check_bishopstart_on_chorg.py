@@ -1,19 +1,20 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import pywikibot
-from pywikibot import pagegenerators as pg
+import re
+
+from random import shuffle
 
 import datetime
 from datetime import datetime
 
-from random import shuffle
+import pywikibot
+from pywikibot import pagegenerators as pg
 
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-import re
 import progressbar
 
 
@@ -39,13 +40,11 @@ def requests_retry_session(
 
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
 QUERY_WITHOUT_START = """
-SELECT ?item ?itemLabel ?birthLabel ?cathid WHERE {
+SELECT ?item ?itemLabel ?cathid WHERE {
   ?item p:P39 ?position;
     wdt:P1047 ?cathid.
   ?position ps:P39 wd:Q611644.
-  OPTIONAL { ?item wdt:P569 ?birth. }
   FILTER(NOT EXISTS { ?position pq:P580 ?start. })
-  FILTER(EXISTS { ?item p:P1047 ?statement. })
 }
 """
 path4qs = 'log_quick_bishopstarts.txt'
@@ -78,10 +77,10 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
         except:
             print('-- No Position for Catholic-Bishop found.')
 
-        if(count_bishoppos < 1):
+        if not count_bishoppos:
             print('-- {} Position-Claims for Catholic Bishop is to less. I skip.'.format(count_bishoppos))
             continue
-        if(count_bishoppos > 1):
+        if count_bishoppos:
             print('-- {} Position-Claims for Catholic Bishop is to much. I skip.'.format(count_bishoppos))
             continue
 
@@ -106,13 +105,13 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                 continue
 
             bishop_tr = re.findall(b'<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Bishop</td>.*</tr>', r.content)
-            if len(bishop_tr) > 0:
+            if bishop_tr:
                 print('-- Bishop-Info: ' + bishop_tr[0].decode('utf-8'))
 
                 bishop_tr_clean = ''
-                if(isinstance(bishop_tr[0].decode('utf-8'), str)):
+                if isinstance(bishop_tr[0].decode('utf-8'), str):
                     bishop_tr_clean = re.sub(r'\<[^\<]+\>', '', bishop_tr[0].decode('utf-8'))
-                if(isinstance(bishop_tr[0], str)):
+                if isinstance(bishop_tr[0], str):
                     bishop_tr_clean = re.sub(r'\<[^\<]+\>', '', bishop_tr[0])
 
                 print('-- Bishop-Info-Clean: ' + bishop_tr_clean)
@@ -122,7 +121,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                 print('-- No Bishop-Ordination Data in table found. I skip.')
                 continue
 
-            if len(bishop_tr_circa) == 0:
+            if not bishop_tr_circa:
 
                 try:
                     bishopstart_datetime = datetime.strptime(bishop_tr_clean.strip(), '%d %b %Y')
