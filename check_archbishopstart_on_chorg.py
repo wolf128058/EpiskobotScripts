@@ -117,7 +117,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                 print('-- No Archbishop-Ordination Data in table found. I skip.')
                 continue
 
-            if bishop_tr_circa:
+            if not bishop_tr_circa:
 
                 try:
                     archbishopstart_datetime = datetime.strptime(bishop_tr.strip(), '%d %b %Y')
