@@ -1,26 +1,23 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+import re
+
 import pywikibot
 from pywikibot import pagegenerators as pg
-
-import datetime
-from datetime import datetime
 
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-import lxml.html
-import re
 import progressbar
 
 
 def requests_retry_session(
-    retries=5,
-    backoff_factor=0.3,
-    status_forcelist=(500, 502, 504),
-    session=None,
+        retries=5,
+        backoff_factor=0.3,
+        status_forcelist=(500, 502, 504),
+        session=None,
 ):
     session = session or requests.Session()
     retry = Retry(
@@ -42,7 +39,7 @@ def dioid2wd(dioid):
     try:
         generator = pg.WikidataSPARQLPageGenerator(QUERY4DIOID, site=wikidata_site)
         for item in generator:
-            mywd = item.get()
+            item.get()
             print('--- WD-Item-4-Diocese found: ' + item.id)
             return item.id
 
@@ -96,10 +93,10 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             if(myjob_id == 'Q1144278' or myjob_id == 'Q948657'):
                 qualifiers = jobclaim.qualifiers
                 for qualifier in qualifiers:
-                    if (qualifier == 'P708'):
+                    if qualifier == 'P708':
                         bAlreadySet = True
 
-        if(bAlreadySet == True):
+        if bAlreadySet == True:
             print('-- diocesan or titular bishopship already set. i skip that candidate')
             continue
         for cathids in claim_list_cathid:
@@ -113,10 +110,8 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                 print('### HTTP-ERROR ON cath-id: ' + chorgurl)
                 continue
 
-            # diocesan_bishopship_tr = re.findall(b'\<tr\>\<td[^\>]+\>.*\<\/td\>\<td\>.*\<\/td\>\<td\>Bishop of (.*)\<\/td\>.*\<\/tr\>', r.content
-            diocesan_bishopship_tr = re.findall(b'<tr><td[^>]+>.*\</td>\<td>.*\</td>\<td>Bishop of (.*)\</td>.*\</tr>', r.content)
-            # titular_bishopship_tr=re.findall(b'\<tr\>\<td[^\>]+\>.*\<\/td\>\<td\>.*\<\/td\>\<td\>Titular Bishop of (.*)\<\/td\>.*\<\/tr\>', r.content
-            titular_bishopship_tr = re.findall(b'<tr><td[^>]+>.*</td><td>.*</td><td>Titular Bishop of (.*)\</td>.*</tr>', r.content)
+            diocesan_bishopship_tr = re.findall(b'<tr><td[^>]+>.*</td><td>.*</td><td>Bishop of (.*)</td>.*</tr>', r.content)
+            titular_bishopship_tr = re.findall(b'<tr><td[^>]+>.*</td><td>.*</td><td>Titular Bishop of (.*)</td>.*</tr>', r.content)
 
             l_dbishop = []
             l_tbishop = []
@@ -124,7 +119,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             if len(diocesan_bishopship_tr) > 0:
                 for x in range(0, len(diocesan_bishopship_tr)):
                     dioceseid = re.findall(b'href="/diocese/d([a-z0-9]+).html"', diocesan_bishopship_tr[x])
-                    if(len(dioceseid) > 0):
+                    if len(dioceseid) > 0:
                         l_dbishop.append(dioceseid[0].decode('utf-8'))
                 l_dbishop = list(set(l_dbishop))
                 print('-- Diocesan-Bishopship-Info: ' + ', '.join(l_dbishop))
@@ -148,7 +143,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             if len(titular_bishopship_tr) > 0:
                 for y in range(0, len(titular_bishopship_tr)):
                     dioceseid = re.findall(b'href="/diocese/d([a-z0-9]+).html"', titular_bishopship_tr[y])
-                    if(len(dioceseid) > 0):
+                    if len(dioceseid) > 0:
                         l_tbishop.append(dioceseid[0].decode('utf-8'))
 
                 l_tbishop = list(set(l_tbishop))

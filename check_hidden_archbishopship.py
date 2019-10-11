@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import re
+
+from random import shuffle
+
 import progressbar
 
 import pywikibot
@@ -11,16 +14,12 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-import lxml.html
-
-from random import shuffle
-
 
 def requests_retry_session(
-    retries=5,
-    backoff_factor=0.3,
-    status_forcelist=(500, 502, 504),
-    session=None,
+        retries=5,
+        backoff_factor=0.3,
+        status_forcelist=(500, 502, 504),
+        session=None,
 ):
     session = session or requests.Session()
     retry = Retry(
@@ -42,7 +41,7 @@ def dioid2wd(dioid):
     try:
         generator = pg.WikidataSPARQLPageGenerator(QUERY4DIOID, site=wikidata_site)
         for item in generator:
-            mywd = item.get()
+            item.get()
             print('--- WD-Item-4-Diocese found: ' + item.id)
             return item.id
 
@@ -115,16 +114,16 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                 elif trgt_pos.id == 'Q50362553':
                     l_known_tbishopships.append(single_pos)
 
-            if (len(l_known_abishopships) > 0):
+            if len(l_known_abishopships) > 0:
                 print('-- Found {} Job-Claims for Archbishopships'.format(len(l_known_abishopships)))
 
-            if (len(l_known_tbishopships) > 0):
+            if len(l_known_tbishopships) > 0:
                 print('-- Found {} Job-Claims for Titular-Archbishopships'.format(len(l_known_abishopships)))
 
             if len(diocesan_bishopship_tr) > 0:
                 for x in range(0, len(diocesan_bishopship_tr)):
                     dioceseid = re.findall(b'href="/diocese/d([a-z0-9]+).html"', diocesan_bishopship_tr[x])
-                    if(len(dioceseid) > 0):
+                    if len(dioceseid) > 0:
                         l_dbishop.append(dioceseid[0].decode('utf-8'))
                 l_dbishop = list(set(l_dbishop))
                 print('-- Diocesan-Arch-Bishopship-Info: ' + ', '.join(l_dbishop))
@@ -137,17 +136,17 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                         a_qualis = known_abishopship.qualifiers
                         if not 'P708' in a_qualis:
                             continue
-                        if (len(a_qualis['P708']) > 1):
+                        if len(a_qualis['P708']) > 1:
                             print('-- !!! Take care there are more than 1 Dio-Claims!')
                             continue
                         diozese_claim = a_qualis['P708'][0]
                         trgt_d = diozese_claim.getTarget()
-                        if (trgt_d.id == mydiowd):
+                        if trgt_d.id == mydiowd:
                             print('-- Found Archbishopship without already known and matching Diozese-Claim.')
                             known_a2d = True
                             continue
 
-                    if (known_a2d == True):
+                    if known_a2d == True:
                         continue
 
                     if (mydiowd != False and mydiowd != None):
@@ -166,7 +165,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             if len(titular_bishopship_tr) > 0:
                 for y in range(0, len(titular_bishopship_tr)):
                     dioceseid = re.findall(b'href="/diocese/d([a-z0-9]+).html"', titular_bishopship_tr[y])
-                    if(len(dioceseid) > 0):
+                    if len(dioceseid) > 0:
                         l_tbishop.append(dioceseid[0].decode('utf-8'))
 
                 l_tbishop = list(set(l_tbishop))
@@ -180,17 +179,17 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                         a_qualis = known_tbishopship.qualifiers
                         if not 'P708' in a_qualis:
                             continue
-                        if (len(a_qualis['P708']) > 1):
+                        if len(a_qualis['P708']) > 1:
                             print('-- !!! Take care there are more than 1 Dio-Claims!')
                             continue
                         diozese_claim = a_qualis['P708'][0]
                         trgt_d = diozese_claim.getTarget()
-                        if (trgt_d.id == mydiowd):
+                        if trgt_d.id == mydiowd:
                             print('-- Found Titular-Archbishopship without already known and matching Diozese-Claim.')
                             known_t2d = True
                             continue
 
-                    if (known_t2d == True):
+                    if known_t2d == True:
                         continue
 
                     if (mydiowd != False and mydiowd != None):

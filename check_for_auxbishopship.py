@@ -1,14 +1,12 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+import re
+
+
 import pywikibot
 from pywikibot import pagegenerators as pg
 
-import datetime
-from datetime import datetime
-
-import lxml.html
-import re
 import requests
 import progressbar
 
@@ -19,7 +17,7 @@ def dioid2wd(dioid):
     try:
         generator = pg.WikidataSPARQLPageGenerator(QUERY4DIOID, site=wikidata_site)
         for item in generator:
-            mywd = item.get()
+            item.get()
             print('--- WD-Item-4-Diocese found: ' + item.id)
             return item.id
 
@@ -69,13 +67,13 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             myjob = jobclaim.getTarget()
             myjob_id = myjob.id
             print('----- JOB-WD-ID: ' + myjob_id)
-            if(myjob_id == 'Q75178'):
+            if myjob_id == 'Q75178':
                 qualifiers = jobclaim.qualifiers
                 for qualifier in qualifiers:
-                    if (qualifier == 'P708'):
+                    if qualifier == 'P708':
                         bAlreadySet = True
 
-        if(bAlreadySet == True):
+        if bAlreadySet == True:
             print('--aux bishopship already set. i skip that candidate')
             continue
         for cathids in claim_list_cathid:
@@ -96,7 +94,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             if len(aux_bishopship_tr) > 0:
                 for x in range(0, len(aux_bishopship_tr)):
                     dioceseid = re.findall(b'href="/diocese/d([a-z0-9]+).html"', aux_bishopship_tr[x])
-                    if(len(dioceseid) > 0):
+                    if len(dioceseid) > 0:
                         l_auxbishop.append(dioceseid[0].decode('utf-8'))
                 l_auxbishop = list(set(l_auxbishop))
                 print('-- Aux-Bishopship-Info: ' + ', '.join(l_auxbishop))
@@ -122,4 +120,4 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             item_properties = ''
 
 
-print(('Done!' + "\n"))
+print('Done!' + "\n")

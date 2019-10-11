@@ -1,19 +1,17 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import pywikibot
-from pywikibot import pagegenerators as pg
-
-import os
-from os import system
-
 import random
-from random import randint
 
 import re
 import lxml.html
 import progressbar
 import requests
+import os
+
+import pywikibot
+from pywikibot import pagegenerators as pg
+
 
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
 repo = wikidata_site.data_repository()
