@@ -11,6 +11,26 @@ import pywikibot
 from pywikibot import pagegenerators as pg
 
 
+def requests_retry_session(
+        retries=5,
+        backoff_factor=0.3,
+        status_forcelist=(500, 502, 504),
+        session=None,
+):
+    session = session or requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
+
+
 def dioid2wd(dioid):
     QUERY4DIOID = 'SELECT ?item ?itemLabel WHERE { ?item wdt:P1866 "' + dioid + '". }'
     wikidata_site = pywikibot.Site('wikidata', 'wikidata')
@@ -79,7 +99,8 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
             print('-- Catholic-Hierarchy-URL: ' + chorgurl)
 
-            r = requests.get(chorgurl)
+            r = requests_retry_session().get(chorgurl)
+
             if r.status_code != 200:
                 print('### HTTP-ERROR ON cath-id: ' + chorgurl)
                 continue
