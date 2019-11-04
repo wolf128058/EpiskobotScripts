@@ -2,14 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import string
 
-import lxml.html
-import requests
 import re
-
 import datetime
 from datetime import datetime
+
+import lxml.html
+
+import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 import pywikibot
 from pywikibot import pagegenerators as pg
@@ -81,8 +83,8 @@ if r.status_code == 200:
     # print source
 
 # CHECK SOURCE FOR DATES
-    priest_tr = re.findall(b"<tr>.*<td>Ordained Priest</td>.*\</tr>", source)
-    if len(priest_tr) > 0:
+    priest_tr = re.findall(b"<tr>.*<td>Ordained Priest</td>.*</tr>", source)
+    if priest_tr:
         item_properties += "\nLAST\tP106\tQ250867\tS1047\t\"" + mycathid + "\"\t"
 
 # BIRTHDATE
@@ -90,15 +92,15 @@ if r.status_code == 200:
 
     birth_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*<td>Born</td></tr>", source)
 
-    if len(birth_tr) > 0:
+    if birth_tr:
         birth_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>Born</td>.*</tr>", source)
 
-    if len(birth_tr) > 0:
+    if birth_tr:
         print('-- Birth-Info: ' + birth_tr[0].decode('utf-8'))
         birth_tr = re.sub(r'\<[^\<]+\>', '', birth_tr[0].decode('utf-8'))
         birth_tr_circa = re.findall(r"(.*)&sup[0-9];", birth_tr.strip())
 
-        if len(birth_tr_circa) == 0:
+        if not birth_tr_circa:
             try:
                 birth_datetime = datetime.strptime(birth_tr, '%d %b %Y')
                 item_properties += "\nLAST\tP569\t+" + birth_datetime.isoformat() + 'Z/11'
@@ -126,10 +128,9 @@ if r.status_code == 200:
     if birth_datetime == None:
 
         birth_prop = re.findall(b'.*<time itemprop="birthDate" datetime="([0-9-]+)">.*</time>.*', source)
-        if len(birth_prop) > 0:
-            print('-- Birth-Prop: ' + birth_prop[0].decode('utf-8'))
 
-        if len(birth_prop) > 0:
+        if birth_prop:
+            print('-- Birth-Prop: ' + birth_prop[0].decode('utf-8'))
             try:
                 birth_datetime = datetime.strptime(birth_prop[0].decode('utf-8'), '%Y-%m-%d')
                 item_properties += "\nLAST\tP569\t+" + birth_datetime.isoformat() + 'Z/11'
@@ -142,17 +143,17 @@ if r.status_code == 200:
     death_datetime = None
 
     death_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*<td>Died</td>.*</tr>", source)
-    if len(death_tr) > 0:
+    if death_tr:
         death_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>Died</td>.*</tr>", source)
-    if len(death_tr) > 0:
+    if death_tr:
         death_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*</td><td>Died</td>.*</tr>", source)
 
-    if len(death_tr) > 0:
+    if death_tr:
         print('-- Death-Info: ' + death_tr[0].decode('utf-8'))
         death_tr = re.sub(r'\<[^\<]+>', '', death_tr[0].decode('utf-8'))
         death_tr_circa = re.findall(r"(.*)&sup[0-9];", death_tr.strip())
 
-        if len(death_tr_circa) == 0:
+        if not death_tr_circa:
             try:
                 death_datetime = datetime.strptime(death_tr, '%d %b %Y')
                 item_properties += "\nLAST\tP570\t+" + death_datetime.isoformat() + 'Z/11'
@@ -181,7 +182,7 @@ if r.status_code == 200:
     if death_datetime == None:
 
         death_prop = re.findall(b'.*<time itemprop="deathDate" datetime="([0-9-]+)">.*</time>.*', source)
-        if len(death_prop) > 0:
+        if death_prop:
             try:
                 death_datetime = datetime.strptime(death_prop[0].decode('utf-8'), '%Y-%m-%d')
                 item_properties += "\nLAST\tP570\t+" + death_datetime.isoformat() + 'Z/11'
@@ -190,7 +191,7 @@ if r.status_code == 200:
                 print('- No valid deathprop found: "' + death_prop[0].decode('utf-8') + '"')
 
     mytitle = re.sub(r'\([^)]*\)', '', mytitle)
-    mytitle = re.sub("\s\s+", " ", mytitle)
+    mytitle = re.sub(r"\s\s+", " ", mytitle)
     mytitle = mytitle.strip()
 
     if mytitle.startswith('Bishop '):
@@ -276,7 +277,7 @@ if r.status_code == 200:
 
     defline += "\t" + item_properties
 
-    if len(mylogfile) > 0:
+    if mylogfile:
         fq = open(mylogfile, "a")
         fq.write("\n\n" + defline)
         fq.close()
