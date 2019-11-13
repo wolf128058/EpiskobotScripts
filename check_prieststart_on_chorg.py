@@ -59,7 +59,7 @@ count_props = 0
 with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
     bar.update(0)
     for index, item in enumerate(generator):
-        mywd = item.get()
+        mywd = item.get(get_redirect=True)
         mywd_id = item.id
         print("\n" + '>> Checking WD-ID: ' + mywd_id)
         print('-- WD-URL: https://www.wikidata.org/wiki/' + mywd_id)

@@ -30,7 +30,7 @@ generator = pg.WikidataSPARQLPageGenerator(QUERY, site=wikidata_site)
 repo = wikidata_site.data_repository()
 
 for item in generator:
-    itemdetails = item.get()
+    itemdetails = item.get(get_redirect=True)
     conse_getter_id = item.id
 
     mycathid = ''

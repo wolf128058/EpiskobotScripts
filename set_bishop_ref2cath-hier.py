@@ -33,7 +33,7 @@ repo = wikidata_site.data_repository()
 with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
     bar.update(0)
     for index, item in enumerate(generator):
-        itemdetails = item.get()
+        itemdetails = item.get(get_redirect=True)
         mycathid = ''
         mywd_id = item.id
         print("\n" + '>> Checking WD-ID: ' + mywd_id)

@@ -58,7 +58,7 @@ with progressbar.ProgressBar(max_value=len(todo_lines), redirect_stdout=True) as
             continue
 
         for item in generator:
-            mywd = item.get()
+            mywd = item.get(get_redirect=True)
             my_prop = my_order.split()[0].strip()
             my_claim = my_order.split()[1].strip()
             if len(my_order.split()) > 2:

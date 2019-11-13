@@ -60,7 +60,7 @@ repo = wikidata_site.data_repository()
 with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
     bar.update(0)
     for index, item in enumerate(generator):
-        itemdetails = item.get()
+        itemdetails = item.get(get_redirect=True)
         mycathid = ''
 
         claim_list_position = itemdetails['claims']['P106']

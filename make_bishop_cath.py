@@ -19,7 +19,7 @@ repo = wikidata_site.data_repository()
 
 for item in generator:
 
-    itemdetails = item.get()
+    itemdetails = item.get(get_redirect=True)
     mypage = pywikibot.ItemPage(repo, item.id)
     claim = pywikibot.Claim(repo, 'P140')
     target = pywikibot.ItemPage(repo, 'Q9592')

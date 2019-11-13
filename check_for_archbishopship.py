@@ -37,7 +37,7 @@ def dioid2wd(dioid):
     try:
         generator = pg.WikidataSPARQLPageGenerator(QUERY4DIOID, site=wikidata_site)
         for item in generator:
-            item.get()
+            item.get(get_redirect=True)
             print('--- WD-Item-4-Diocese found: ' + item.id)
             return item.id
     except:
@@ -67,7 +67,8 @@ count_props = 0
 
 with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
     for index, item in enumerate(generator):
-        mywd = item.get()
+        bar.update(index)
+        mywd = item.get(get_redirect=True)
         mywd_id = item.id
         print("\n" + '>> Checking WD-ID: ' + mywd_id)
         print('-- WD-URL: https://www.wikidata.org/wiki/' + mywd_id)
@@ -156,11 +157,10 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                             new_claim.addQualifier(target_dioclaim)
                             item.addClaim(new_claim, summary='added titular-archbishopship-claim')
 
-            bar.update(index)
-            fq = open(path4qs, "a")
-            fq.write(item_properties)
-            fq.close()
-            item_properties = ''
+        fq = open(path4qs, "a")
+        fq.write(item_properties)
+        fq.close()
+        item_properties = ''
 # eof
 
 

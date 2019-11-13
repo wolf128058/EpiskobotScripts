@@ -68,7 +68,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
         #    if counter >= 1000:
         #        break
         changed = False
-        item.get()
+        item.get(get_redirect=True)
         mylabel = ''
         myid = item.id
         print('>>> Examining: ' + item.id)
@@ -110,7 +110,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             match = False
             for item in subgenerator_fn:
                 match = True
-                mynameitem = item.get()
+                mynameitem = item.get(get_redirect=True)
                 print('### Male firstname found: "' + words[0] + '" is ' + item.id)
                 Names2Items[firstname] = item.id
                 fq = open(path4qs, "a")

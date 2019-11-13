@@ -28,7 +28,7 @@ if(os.path.isfile(path4todo) == False):
 
     with progressbar.ProgressBar(max_value=len(generator_todo)) as unknown_bar:
         for index, todo_item in enumerate(generator_todo):
-            todo_wd = todo_item.get()
+            todo_wd = todo_item.get(get_redirect=True)
             todo_chid = todo_wd['claims']['P1047']
             l_todo.append(todo_chid[0].getTarget())
             unknown_bar.update(index)
@@ -70,7 +70,7 @@ known_consids_chorg = []
 claim_list_conse_len = 0
 
 for item in subgenerator_myself:
-    mywd = item.get()
+    mywd = item.get(get_redirect=True)
     mywd_id = item.id
     claim_list_conse = {}
     print('-- Candidate URL on WD.org: https://www.wikidata.org/wiki/' + mywd_id)
