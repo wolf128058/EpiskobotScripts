@@ -57,7 +57,8 @@ count_props = 0
 with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
     bar.update(0)
     for index, item in enumerate(generator):
-        mywd = item.get()
+        bar.update(index)
+        mywd = item.get(get_redirect=True)
         mywd_id = item.id
         print("\n" + '>> Checking WD-ID: ' + mywd_id)
         print('-- WD-URL: https://www.wikidata.org/wiki/' + mywd_id)
@@ -80,7 +81,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
         if not count_bishoppos:
             print('-- {} Position-Claims for Catholic Bishop is to less. I skip.'.format(count_bishoppos))
             continue
-        if count_bishoppos:
+        if count_bishoppos > 1:
             print('-- {} Position-Claims for Catholic Bishop is to much. I skip.'.format(count_bishoppos))
             continue
 
@@ -161,7 +162,6 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                             count_props += 1
                         except:
                             print('- No valid ~startdate (precision year) found: "' + bishop_tr_circa[0].strip() + '"')
-        bar.update(index)
     fq = open(path4qs, "a")
     fq.write(item_properties)
     fq.close()
