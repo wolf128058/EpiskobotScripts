@@ -94,6 +94,7 @@ abreu
 abrgon
 abri
 absa
+absalon
 absb
 absi
 abste
@@ -521,6 +522,7 @@ albergi
 albergon
 albergv
 alberi
+alberic
 alberica
 alberici
 alberion
@@ -548,6 +550,7 @@ albini
 albinic
 albinip
 albinit
+albino
 albinus
 albinvh
 albis
@@ -1008,6 +1011,7 @@ amou
 ampe
 ampten
 ampu
+ampudia
 amskis
 amst
 amulio
@@ -1073,6 +1077,7 @@ andreaal
 andreae
 andreag
 andreaga
+andreao
 andreas
 andreass
 andreish
@@ -1886,6 +1891,7 @@ aunt
 aupetit
 aura
 aurach
+auram
 aureac
 aurej
 aureje
@@ -1896,6 +1902,7 @@ aurre
 ausdmf
 aussem
 ausson
+aussonp
 austl
 austm
 austo
@@ -8258,6 +8265,7 @@ cmpgg
 cmpig
 cmpnlga
 cmpnsch
+cmtbs
 cmzzj
 cndda
 cnt
@@ -11275,6 +11283,7 @@ dlra
 dlrb
 dlreyes
 dlriv
+dlroche
 dlrov
 dlrova
 dlrovc
@@ -11374,6 +11383,7 @@ dmoura
 dmule
 dmur
 dmyterko
+dnanton
 dnasan
 dnasc
 dnascj
@@ -11871,6 +11881,7 @@ dsaal
 dsac
 dsael
 dsala
+dsalao
 dsalc
 dsales
 dsalesc
@@ -12837,6 +12848,7 @@ evelino
 ever
 evera
 everdon
+everg
 evermod
 evesham
 evorapdl
@@ -17015,6 +17027,7 @@ gueu
 guevaraj
 guevarra
 guevd
+guevf
 guevj
 gueye
 guffens
@@ -17167,6 +17180,7 @@ gunnari
 gunners
 guno
 gunt
+gunteri
 guojinca
 gurb
 gurd
@@ -17407,6 +17421,7 @@ hamagu
 hamaosf
 hamelin
 hamelinc
+hamelinl
 hamer
 hamerf
 hameri
@@ -17940,6 +17955,7 @@ hildh
 hildha
 hildhe
 hildm
+hildolf
 hildri
 hildt
 hilfrich
@@ -18299,6 +18315,7 @@ humann
 humano
 humbr
 hume
+humfrid
 humm
 hummes
 humr
@@ -18442,6 +18459,7 @@ ilonu
 ilsen
 ilsine
 ilundain
+imar
 imb
 imbamba
 imbe
@@ -22063,6 +22081,7 @@ luchim
 luchimj
 luchini
 luchiv
+luchok
 luci
 lucia
 luciad
@@ -24303,6 +24322,7 @@ megale
 megali
 megan
 meginge
+megisto
 megl
 megn
 megon
@@ -27337,6 +27357,7 @@ olearyl
 olearyt
 olecho
 oleg
+olegario
 olendz
 oles
 olesn
