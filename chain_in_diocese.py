@@ -27,7 +27,6 @@ if len(sys.argv) == 2:
     POSITION = sys.argv[1]
     QUERY = '''
     SELECT ?item WHERE {
-      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
       ?item wdt:P39 wd:''' + POSITION + ''' .
       FILTER(NOT EXISTS {?item wdt:P39 wd:Q157037})
       FILTER(EXISTS {
@@ -90,6 +89,34 @@ if len(sys.argv) == 2:
 
     if predecessor == False:
         exit()
+
+
+if len(sys.argv) == 3:
+    POSITION = sys.argv[1]
+    COMMON_PROP_VALUE = sys.argv[2]
+    QUERY = '''
+    SELECT ?item ?itemLabel ?birthLabel ?deathLabel WHERE {
+      ?item wdt:P39 wd:''' + POSITION + ''';
+        p:P39 ?DBship.
+      ?DBship pq:P708 wd:''' + COMMON_PROP_VALUE + '''.
+      OPTIONAL { ?item wdt:P569 ?birth. }
+      OPTIONAL { ?item wdt:P570 ?death. }
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de". }
+    }
+    GROUP BY (?item) (?itemLabel) (?birthLabel) (?deathLabel)
+    ORDER BY DESC (?birthLabel) (?deathLabel)
+    LIMIt 1
+    '''
+    wikidata_site = pywikibot.Site('wikidata', 'wikidata')
+    generator = pg.WikidataSPARQLPageGenerator(QUERY, site=wikidata_site)
+    generator = list(generator)
+
+    if not generator:
+        print('No initial Candidate found.')
+        exit()
+    else:
+        INITIAL_OFFICEHOLDER = generator[0].id
+        print('>>> Starting the Chain with: : https://www.wikidata.org/wiki/' + str(INITIAL_OFFICEHOLDER))
 
 
 def set_successor(officeholder, office, pkey, pvalue, successor):
