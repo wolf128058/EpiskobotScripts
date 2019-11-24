@@ -1,14 +1,15 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+
+from random import shuffle
+
 import progressbar
 
 import pywikibot
 from pywikibot import pagegenerators as pg
 
 import lxml.html
-
-from random import shuffle
 
 QUERY = '''
 SELECT ?item ?itemLabel ?religion ?cathid ?rel2sub WHERE {
@@ -48,7 +49,6 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             print('-- Catholic-Hierarchy-Id: ' + mycathid)
             print('-- URL: ' + chorgurl)
 
-
         for rel_claim in claim_list_position:
             trgt = rel_claim.getTarget()
             print('-- Claim for {} found.'.format(trgt.id))
@@ -57,7 +57,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                 source_claim.setTarget(mycathid)
                 rel_claim_sources = rel_claim.getSources()
 
-                if len(rel_claim_sources) == 0:
+                if not rel_claim_sources:
                     t = lxml.html.parse(chorgurl)
                     mytitle = t.find(".//title").text
 
