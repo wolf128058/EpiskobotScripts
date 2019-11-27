@@ -262,6 +262,7 @@ advi
 adwok
 aelen
 aelfh
+aelfr
 aeng
 aerath
 aernou
@@ -4589,6 +4590,7 @@ bosj
 bosl
 bosnia
 bosny
+boso
 boson
 bosone
 bosov
@@ -12455,6 +12457,7 @@ eganp
 eganw
 egas
 egbebo
+egbert
 egerega
 egga
 egge
@@ -12522,6 +12525,7 @@ elder
 eleazar
 elega
 eleta
+elfn
 elford
 elgard
 elha
@@ -12836,6 +12840,7 @@ etgn
 ethe
 etheld
 ether
+ethls
 etienne
 etiennef
 etoga
@@ -17721,6 +17726,7 @@ heimo
 hein
 heinrim
 heinrm
+heins
 heinsb
 heinsbg
 heint
@@ -18287,6 +18293,7 @@ hranic
 hrdlicka
 hrebn
 hrekung
+hrmn
 hrmnn
 hrus
 hrutsa
