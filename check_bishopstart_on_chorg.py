@@ -106,6 +106,8 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                 continue
 
             bishop_tr = re.findall(b'<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Bishop</td>.*</tr>', r.content)
+            if not bishop_tr:
+                bishop_tr = re.findall(b'<tr><td[^>]+>(.*)</td><td>Ordained Bishop</td>.*</tr>', r.content)
             if bishop_tr:
                 print('-- Bishop-Info: ' + bishop_tr[0].decode('utf-8'))
 
@@ -162,9 +164,9 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                             count_props += 1
                         except:
                             print('- No valid ~startdate (precision year) found: "' + bishop_tr_circa[0].strip() + '"')
-    fq = open(path4qs, "a")
-    fq.write(item_properties)
-    fq.close()
-    item_properties = ''
+        fq = open(path4qs, "a")
+        fq.write(item_properties)
+        fq.close()
+        item_properties = ''
 
 print('Done!' + "\n")
