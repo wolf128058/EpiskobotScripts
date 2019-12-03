@@ -134,11 +134,14 @@ def set_successor(officeholder, office, pkey, pvalue, successor):
             print('--- Skipping Entry for ' + office + ' without qualifiers')
             continue
 
-        if qualifiers[pkey]:
-            my_propval = qualifiers[pkey][0].getTarget()
-            if my_propval.id != pvalue:
-                # key-value-macht not found
-                continue
+        try:
+            if qualifiers[pkey]:
+                my_propval = qualifiers[pkey][0].getTarget()
+                if my_propval.id != pvalue:
+                    # key-value-macht not found
+                    continue
+        except:
+            continue
 
         try:
             if qualifiers[KEY_SUCCESSOR]:
@@ -155,7 +158,11 @@ def get_predecessor(officeholder):
     print()
     print('>> CHECKING: https://www.wikidata.org/wiki/' + officeholder)
     item = pywikibot.ItemPage(repo, officeholder)
-    mywd = item.get(get_redirect=True)
+    try:
+        mywd = item.get()
+    except:
+        print('-- Redirection found.')
+        mywd = item.get(get_redirect=True)
     claim_list_pos = mywd['claims']['P39']
 
     for pos_item in claim_list_pos:
@@ -169,12 +176,15 @@ def get_predecessor(officeholder):
             if not qualifiers:
                 continue
 
-            if qualifiers[COMMON_PROP_KEY]:
-                my_propval = qualifiers[COMMON_PROP_KEY][0].getTarget()
-                if my_propval.id == COMMON_PROP_VALUE:
-                    print('- Qualifier-Match[' + COMMON_PROP_KEY + '] == ' + COMMON_PROP_VALUE)
-                else:
-                    continue
+            try:
+                if qualifiers[COMMON_PROP_KEY]:
+                    my_propval = qualifiers[COMMON_PROP_KEY][0].getTarget()
+                    if my_propval.id == COMMON_PROP_VALUE:
+                        print('- Qualifier-Match[' + COMMON_PROP_KEY + '] == ' + COMMON_PROP_VALUE)
+                    else:
+                        continue
+            except:
+                continue
 
             try:
                 if qualifiers[KEY_PREDECESSOR]:
