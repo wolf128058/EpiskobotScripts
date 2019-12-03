@@ -105,17 +105,67 @@ if len(sys.argv) == 3:
     }
     GROUP BY (?item) (?itemLabel) (?birthLabel) (?deathLabel)
     ORDER BY DESC (?birthLabel) (?deathLabel)
-    LIMIt 1
+    LIMIT 10
     '''
     wikidata_site = pywikibot.Site('wikidata', 'wikidata')
     generator = pg.WikidataSPARQLPageGenerator(QUERY, site=wikidata_site)
     generator = list(generator)
+    initial_candidate = False
 
     if not generator:
         print('No initial Candidate found.')
         exit()
     else:
-        INITIAL_OFFICEHOLDER = generator[0].id
+        candidate_found = False
+        for candidate in generator:
+            if candidate_found:
+                break
+            candidate_item = candidate.get(get_redirect=True)
+            print('>> RANDOM CANDIDATE: https://www.wikidata.org/wiki/' + candidate.id)
+            claim_list_pos = candidate_item['claims']['P39']
+
+            for pos_item in claim_list_pos:
+
+                pos_item_target = pos_item.getTarget()
+                if pos_item_target.id != POSITION:
+                    print('-- ' + pos_item_target.id + ' is not the correct pos-claim (' + POSITION + '), i skip that one')
+                    continue
+                else:
+                    print('-- Correct pos-claim.')
+
+                my_pos_data = pos_item.getTarget()
+                if my_pos_data.id != POSITION:
+                    continue
+
+                qualifiers = pos_item.qualifiers
+                if not qualifiers:
+                    print('--- Skipping Entry for ' + pos_item.id + ' without qualifiers')
+                    continue
+
+                try:
+                    if qualifiers[COMMON_PROP_KEY]:
+                        my_propval = qualifiers[COMMON_PROP_KEY][0].getTarget()
+                        if(my_propval.id != COMMON_PROP_VALUE):
+                            print('-- Skipping wrong diocese: ' + my_propval.id + '(Searching for: ' + COMMON_PROP_VALUE + ')')
+                            continue
+                except:
+                    print('-- Entry has no diocese -> skipping.')
+                    continue
+
+                try:
+                    if qualifiers[KEY_PREDECESSOR]:
+                        print('-- There is a predecessor.')
+                        candidate_found = True
+                        initial_candidate = candidate.id
+                except:
+                    print('-- There is no predecessor.')
+                    continue
+
+        if candidate_found == False:
+            print('No matching candidate for Position ' + POSITION + ' in Dio ' + COMMON_PROP_VALUE + ' found.')
+            exit()
+
+        INITIAL_OFFICEHOLDER = initial_candidate
         print('>>> Starting the Chain with: : https://www.wikidata.org/wiki/' + str(INITIAL_OFFICEHOLDER))
 
 
