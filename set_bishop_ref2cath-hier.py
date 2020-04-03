@@ -1,15 +1,37 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+import re
 
 from random import shuffle
 
 import progressbar
 
+import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+
 import pywikibot
 from pywikibot import pagegenerators as pg
 
+
 import lxml.html
+
+
+def requests_retry_session(retries=5, backoff_factor=0.3, status_forcelist=(500, 502, 504), session=None):
+    session = session or requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
+
 
 QUERY = '''
 SELECT ?item ?itemLabel ?religion ?cathid ?rel2sub WHERE {
@@ -65,7 +87,18 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                         print('-- Title match: "' + mytitle + '"')
                         rel_claim.addSources([source_claim], summary='add catholic-hierarchy as source for position catholic-bishop')
                     else:
-                        print('-- Not title match: "' + mytitle + '"')
+
+                        r = requests_retry_session().get(chorgurl)
+                        if r.status_code != 200:
+                            print('### HTTP-ERROR ON cath-id: ' + chorgurl)
+                            continue
+
+                        dio_bishopship_tr = re.findall(b'<tr><td[^>]+>.*</td><td>(Succeeded|Appointed|Ordained Bishop)</td><td>(Bishop of |Titular Bishop of )(.*)</td>.*</tr>', r.content)
+                        if dio_bishopship_tr:
+                            print('-- Table match: "' + dio_bishopship_tr[0][0].decode('iso-8859-1') + ', ' + dio_bishopship_tr[0][1].decode('iso-8859-1') + ', ' + dio_bishopship_tr[0][2].decode('iso-8859-1') + '"')
+                            rel_claim.addSources([source_claim], summary='add catholic-hierarchy as source for position catholic-bishop')
+                        else:
+                            print('-- Not title match: "' + mytitle + '"')
 
         bar.update(index)
 
