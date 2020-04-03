@@ -78,7 +78,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
 
                 rel_claim_sources = rel_claim.getSources()
 
-                if len(rel_claim_sources) == 0:
+                if not rel_claim_sources:
                     chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
                     r = requests_retry_session().get(chorgurl)
 
