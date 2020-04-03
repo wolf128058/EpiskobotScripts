@@ -7,6 +7,10 @@ import re
 import datetime
 from datetime import datetime
 
+from urllib import parse
+
+import urllib.parse
+
 import lxml.html
 
 import requests
@@ -260,7 +264,7 @@ if r.status_code == 200:
         defline += "\nLAST\tLde\t\"" + item_label + "\""
         defline += "\nLAST\tLen\t\"" + item_label + "\""
 
-    elif mytitle.find('Cardinal '):
+    elif mytitle.find('Cardinal ') != -1:
         item_properties += "\nLAST\tP39\tQ45722\tS1047\t\"" + mycathid + "\"\t"
         defline += "\nLAST\tDde\t\"Kardinal der römisch-katholischen Kirche\""
         defline += "\nLAST\tDen\t\"cardinal of the roman-catholic church\""
@@ -272,17 +276,45 @@ if r.status_code == 200:
         defline += "\nLAST\tLde\t\"" + item_label + "\""
         defline += "\nLAST\tLen\t\"" + item_label + "\""
 
+    elif mytitle.find('Patriotic Bishop ') != -1:
+        item_properties += "\nLAST\tP39\tQ611644\tS1047\t\"" + mycathid + "\"\t"
+        defline += "\nLAST\tDde\t\"Patriotischer Bischof\""
+        defline += "\nLAST\tDen\t\"patriotic bishop\""
+        item_label = mytitle.replace('Patriotic Bishop ', '')
+        defline += "\nLAST\tLde\t\"" + item_label + "\""
+        defline += "\nLAST\tLen\t\"" + item_label + "\""
+
     else:
         quit('--- unknown job on "' + mytitle + '" ---')
 
     defline += "\t" + item_properties
 
-    if mylogfile:
-        fq = open(mylogfile, "a")
-        fq.write("\n\n" + defline)
-        fq.close()
+    quickurl = 'https://tools.wmflabs.org/quickstatements/api.php?'
+    quickurl += 'action=import'
+    quickurl += '&submit=1'
+    quickurl += '&username=USEYOUROWNUSERNAME'
+    quickurl += '&token=USEYOUROWNTOKEN'
+    quickurl += '&format=v1'
+    quickurl += '&data=' + urllib.parse.quote(defline, safe='')
+    quickurl += '&compress=0'
+    quickurl += '&site=wikidata'
+    quickurl += ''
 
-    print("\n\n" + defline + "\n\n")
+    split_url = parse.urlsplit(quickurl)
 
+    r = requests.post(split_url.scheme + "://" + split_url.netloc + split_url.path, data=dict(parse.parse_qsl(parse.urlsplit(quickurl).query)))
+
+    if r.text['status'] == 'OK':
+        print('- Creation initiated automatically: See https://tools.wmflabs.org/quickstatements/#/batch/' + r.text['batch_id'] + ' for status.')
+    else:
+        print('>> Error on batch submission: Try Url:')
+        print('>> ' + quickurl)
+
+        if mylogfile:
+            fq = open(mylogfile, "a")
+            fq.write("\n\n" + defline)
+            fq.close()
+
+        print("\n\n" + defline + "\n\n")
 
 print('  Done!')
