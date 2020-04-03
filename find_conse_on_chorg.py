@@ -2,16 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import os
-
 import re
-
-
-import pywikibot
-from pywikibot import pagegenerators as pg
-
+from random import shuffle
 
 import lxml.html
 import requests
+import progressbar
+
+import pywikibot
+from pywikibot import pagegenerators as pg
 
 path4qs = 'log_quick_consefounds.txt'
 
