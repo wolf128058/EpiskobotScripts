@@ -60,7 +60,7 @@ SELECT ?item WHERE {
 GROUP BY (?item)
 '''
 
-path4qs = 'log_quick_hiddenbishopships.txt'
+path4qs = 'data/log_quick_hiddenbishopships.txt'
 generator = pg.WikidataSPARQLPageGenerator(QUERY_WITHOUT_START, site=wikidata_site)
 generator = list(generator)
 shuffle(generator)

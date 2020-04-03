@@ -58,7 +58,7 @@ SELECT ?item ?itemLabel ?birthLabel ?cathiLabel WHERE {
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
 """
-path4qs = 'log_quick_archbishop2diocese.txt'
+path4qs = 'data/log_quick_archbishop2diocese.txt'
 generator = pg.WikidataSPARQLPageGenerator(QUERY_WITHOUT_START, site=wikidata_site)
 generator = list(generator)
 

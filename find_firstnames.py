@@ -38,7 +38,7 @@ def sparql_namesearch(firstname):
     return querystring
 
 
-path4qs = 'log_quick_namefounds.txt'
+path4qs = 'data/log_quick_namefounds.txt'
 
 QUERY = """
 # ohne vornamen

@@ -47,7 +47,7 @@ SELECT ?item ?itemLabel ?birthLabel ?cathid WHERE {
   FILTER(NOT EXISTS { ?position pq:P580 ?start. })
 }
 """
-path4qs = 'log_quick_archbishopstarts.txt'
+path4qs = 'data/log_quick_archbishopstarts.txt'
 generator = pg.WikidataSPARQLPageGenerator(QUERY_WITHOUT_START, site=wikidata_site)
 generator = list(generator)
 shuffle(generator)

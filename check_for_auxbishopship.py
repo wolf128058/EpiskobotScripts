@@ -62,7 +62,7 @@ SELECT ?item ?itemLabel ?birthLabel ?cathiLabel WHERE {
 ORDER BY DESC (?birthLabel)
 LIMIT 5000
 """
-path4qs = 'log_quick_auxbishopships.txt'
+path4qs = 'data/log_quick_auxbishopships.txt'
 generator = pg.WikidataSPARQLPageGenerator(QUERY_WITHOUT_START, site=wikidata_site)
 generator = list(generator)
 repo = wikidata_site.data_repository()

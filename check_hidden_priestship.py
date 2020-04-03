@@ -47,7 +47,7 @@ SELECT ?item WHERE {
 }
 """
 
-path4qs = 'log_quick_hiddenpriestships.txt'
+path4qs = 'data/log_quick_hiddenpriestships.txt'
 generator = pg.WikidataSPARQLPageGenerator(QUERY_WITHOUT_START, site=wikidata_site)
 generator = list(generator)
 shuffle(generator)

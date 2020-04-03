@@ -13,7 +13,7 @@ from lxml import html
 import re
 import requests
 
-path4qs = 'log_quick_bishops_found.txt'
+path4qs = 'data/log_quick_bishops_found.txt'
 
 QUERY = """
 SELECT ?item WHERE {

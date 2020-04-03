@@ -49,7 +49,7 @@ SELECT ?item ?itemLabel ?birthLabel ?cathid WHERE {
   FILTER(EXISTS { ?item p:P1047 ?statement. })
 }
 """
-path4qs = 'log_quick_prieststarts.txt'
+path4qs = 'data/log_quick_prieststarts.txt'
 generator = pg.WikidataSPARQLPageGenerator(QUERY_WITHOUT_START, site=wikidata_site)
 generator = list(generator)
 shuffle(generator)

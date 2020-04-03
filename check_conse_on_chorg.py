@@ -16,7 +16,7 @@ from pywikibot import pagegenerators as pg
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
 repo = wikidata_site.data_repository()
 
-path4qs = 'log_quick_consefounds.txt'
+path4qs = 'data/log_quick_consefounds.txt'
 path4todo = 'todo-consecheck.txt'
 
 if(os.path.isfile(path4todo) == False):

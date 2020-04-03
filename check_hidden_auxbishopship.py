@@ -61,7 +61,7 @@ ORDER BY (RAND())
 LIMIT 50000
 """
 
-path4qs = 'log_quick_hiddenauxbishopships.txt'
+path4qs = 'data/log_quick_hiddenauxbishopships.txt'
 generator = pg.WikidataSPARQLPageGenerator(QUERY_WITHOUT_START, site=wikidata_site)
 generator = list(generator)
 shuffle(generator)
