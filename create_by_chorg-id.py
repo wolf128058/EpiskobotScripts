@@ -295,6 +295,7 @@ if r.status_code == 200:
     quickurl += '&username=USEYOUROWNUSERNAME'
     quickurl += '&token=USEYOUROWNTOKEN'
     quickurl += '&format=v1'
+    quickurl += '&batchname=create-' + mycathid
     quickurl += '&data=' + urllib.parse.quote(defline, safe='')
     quickurl += '&compress=0'
     quickurl += '&site=wikidata'
