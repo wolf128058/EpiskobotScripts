@@ -2,20 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import re
-
 from random import shuffle
 
 import datetime
 from datetime import datetime
 
-import pywikibot
-from pywikibot import pagegenerators as pg
-
 import requests
 from requests.adapters import HTTPAdapter
-from requests.packages.urllib3.util.retry import Retry
+from urllib3.util import Retry
 
 import progressbar
+
+import pywikibot
+from pywikibot import pagegenerators as pg
 
 
 def requests_retry_session(
