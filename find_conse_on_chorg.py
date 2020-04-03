@@ -15,103 +15,155 @@ from pywikibot import pagegenerators as pg
 path4qs = 'log_quick_consefounds.txt'
 
 QUERY = """
-SELECT ?item ?itemLabel ?cathiLabel ?birthLabel WHERE {
+SELECT ?item  ?birthLabel WHERE {
   ?item wdt:P1047 ?cathi.
   OPTIONAL {?item wdt:P569 ?birth}
-  FILTER(NOT EXISTS { ?item wdt:P1598 ?statement. })
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
-  FILTER((YEAR(?birth)) >= 0 )
+ FILTER(EXISTS { ?item wdt:P1598 ?statement. })
 }
-ORDER BY DESC (?birthLabel)"""
+ORDER BY DESC (?birthLabel)
+LIMIT 5000
+"""
 
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
-
 generator = pg.WikidataSPARQLPageGenerator(QUERY, site=wikidata_site)
+generator = list(generator)
+print('>>> Starting with ' + str(len(generator)) + ' entries')
+
+shuffle(generator)
+
 repo = wikidata_site.data_repository()
 
-for item in generator:
-    itemdetails = item.get(get_redirect=True)
-    mycathid = ''
-    changed = False
-    conse_getter_id = item.id
-    conse_setter_id = ''
-    claim_list_cathid = itemdetails['claims']['P1047']
-
-    for cathids in claim_list_cathid:
-        mycathid = cathids.getTarget()
-        if mycathid:
-            continue
-        chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
-
+with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
+    for index, item in enumerate(generator):
+        bar.update(index)
+        itemdetails = item.get(get_redirect=True)
+        mycathid = ''
+        changed = False
+        conse_getter_id = item.id
+        print('>> CHECKING: Wikidata-Item: https://www.wikidata.org/wiki/' + conse_getter_id)
+        conse_setter_id = ''
+        claim_list_cathid = itemdetails['claims']['P1047']
         try:
-            r = requests.head(chorgurl)
+            claim_list_conses = itemdetails['claims']['P1598']
         except:
-            continue
+            claim_list_conses = []
 
-        if r.status_code != 200:
-            print('### ERROR ON cath-id: ' + mycathid)
-        if r.status_code == 200:
-            print('')
-            print('>> Catholic-Hierarchy-Id: ' + mycathid)
-            print('-- URL: ' + chorgurl)
+        known_conses = []
+
+        for conse in claim_list_conses:
+            myconse = conse.getTarget()
+            if not myconse:
+                continue
+            known_conses.append(myconse.id)
+
+        if known_conses:
+            print(known_conses)
+
+        for cathids in claim_list_cathid:
+            mycathid = cathids.getTarget()
+            if not mycathid:
+                continue
+            chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
 
             try:
-                t = lxml.html.parse(chorgurl)
+                r = requests.head(chorgurl)
             except:
                 continue
 
-            mytitle = t.find(".//title").text
-            mytitle = mytitle.replace(' [Catholic-Hierarchy]', '')
-            print('-- Title: ' + mytitle)
-            mylistitems = t.findall(".//li")
-            for listitem in mylistitems:
-                if listitem.text == 'Principal Consecrator:':
-                    firstlink = listitem.find('.//a[@href]')
-                    firsthref = firstlink.attrib['href']
-                    conse_match = re.match('b([0-9a-z]+).html', firsthref)
-                    if conse_match:
-                        print('-- conse: ' + conse_match.groups()[0])
-                        SUBQUERY_CONSE = 'SELECT ?item WHERE { ?item wdt:P1047 "' + conse_match.groups()[
-                            0] + '". }'
-                        subgenerator_conse = pg.WikidataSPARQLPageGenerator(
-                            SUBQUERY_CONSE, site=wikidata_site)
-                        count_conse_found = 0
-                        for item in subgenerator_conse:
-                            count_conse_found += 1
-                            conse_setter_id = item.id
-                        if count_conse_found == 1:
-                            print('!!! Conse found: ' + conse_setter_id + ' => ' + conse_getter_id)
-                            fq = open(path4qs, "a")
-                            fq.write("\n" + conse_getter_id +
-                                     "\tP1598\t" + conse_setter_id + "\tP3831\tQ18442817")
-                            fq.close()
-                        elif count_conse_found == 0:
-                            print('-- checking ch.org for conse-info: ' + 'http://www.catholic-hierarchy.org/bishop/b' + conse_match.groups()[0] + '.html')
-                            os.system("./create_by_chorg-id.py " + conse_match.groups()[0] + " create_quick_log.txt")
+            if r.status_code != 200:
+                print('### ERROR ON cath-id: ' + mycathid)
+            if r.status_code == 200:
+                print('')
+                print('>> Catholic-Hierarchy-Id: ' + mycathid)
+                print('-- URL: ' + chorgurl)
 
-                elif listitem.text == 'Principal Co-Consecrators:' and count_conse_found == 1:
-                    firstlink = listitem.find('.//a[@href]')
-                    firsthref = firstlink.attrib['href']
-                    coconse_match = re.match('b([0-9a-z]+).html', firsthref)
-                    if coconse_match:
-                        print('-- co-conse: ' + coconse_match.groups()[0])
-                        SUBQUERY_COCONSE = 'SELECT ?item WHERE { ?item wdt:P1047 "' + coconse_match.groups()[
-                            0] + '". }'
-                        subgenerator_coconse = pg.WikidataSPARQLPageGenerator(
-                            SUBQUERY_COCONSE, site=wikidata_site)
-                        count_coconse_found = 0
-                        for item in subgenerator_coconse:
-                            count_coconse_found += 1
-                            conse_setter_id = item.id
-                            if count_coconse_found >= 1:
-                                print('!!! Co-Conse found: ' + conse_setter_id + ' => ' + conse_getter_id)
+                try:
+                    t = lxml.html.parse(chorgurl)
+                except:
+                    continue
+
+                mytitle = t.find(".//title").text
+                mytitle = mytitle.replace(' [Catholic-Hierarchy]', '')
+                print('-- Title: ' + mytitle)
+                mylistitems = t.findall(".//li")
+                for listitem in mylistitems:
+                    if listitem.text == 'Principal Consecrator:':
+                        firstlink = listitem.find('.//a[@href]')
+                        firsthref = firstlink.attrib['href']
+                        conse_match = re.match('b([0-9a-z]+).html', firsthref)
+                        if conse_match:
+                            print('-- conse: ' + conse_match.groups()[0])
+                            SUBQUERY_CONSE = 'SELECT ?item WHERE { ?item wdt:P1047 "' + conse_match.groups()[
+                                0] + '". }'
+                            subgenerator_conse = pg.WikidataSPARQLPageGenerator(
+                                SUBQUERY_CONSE, site=wikidata_site)
+                            count_conse_found = 0
+                            for conse_item in subgenerator_conse:
+                                count_conse_found += 1
+                                conse_setter_id = conse_item.id
+                            if count_conse_found == 1:
+                                print('!!! Conse found: ' + conse_setter_id + ' => ' + conse_getter_id)
+                                if conse_setter_id in known_conses:
+                                    print('- this is a known one, we skip the quick-statement and add a source')
+
+                                    for conse in claim_list_conses:
+                                        myconse = conse.getTarget()
+                                        if myconse.id == conse_setter_id:
+                                            conse_claim_sources = conse.getSources()
+                                            if not conse_claim_sources:
+                                                source_claim = pywikibot.Claim(repo, 'P1047')
+                                                source_claim.setTarget(mycathid)
+                                                conse.addSources([source_claim], summary='add catholic-hierarchy as source for consecrator')
+                                    continue
+
                                 fq = open(path4qs, "a")
                                 fq.write("\n" + conse_getter_id +
-                                         "\tP1598\t" + conse_setter_id + "\tP3831\tQ18442822")
+                                         "\tP1598\t" + conse_setter_id + "\tP3831\tQ18442817" +
+                                         "\tS1047\t\"" + mycathid + "\"")
                                 fq.close()
                             elif count_conse_found == 0:
-                                print('-- checking ch.org for co-conse-info: ' + 'http://www.catholic-hierarchy.org/bishop/b' + conse_match.groups()[0] + '.html')
+                                print('-- checking ch.org for conse-info: ' + 'http://www.catholic-hierarchy.org/bishop/b' + conse_match.groups()[0] + '.html')
                                 os.system("./create_by_chorg-id.py " + conse_match.groups()[0] + " create_quick_log.txt")
+
+                    elif listitem.text == 'Principal Co-Consecrators:' and count_conse_found == 1:
+                        links = listitem.findall('.//a[@href]')
+
+                        for link_item in links:
+                            myhref = link_item.attrib['href']
+                            coconse_match = re.match('b([0-9a-z]+).html', myhref)
+                            if coconse_match:
+                                print('-- co-conse: ' + coconse_match.groups()[0])
+                                SUBQUERY_COCONSE = 'SELECT ?item WHERE { ?item wdt:P1047 "' + coconse_match.groups()[
+                                    0] + '". }'
+                                subgenerator_coconse = pg.WikidataSPARQLPageGenerator(
+                                    SUBQUERY_COCONSE, site=wikidata_site)
+                                count_coconse_found = 0
+                                for coconse_item in subgenerator_coconse:
+                                    count_coconse_found += 1
+                                    conse_setter_id = coconse_item.id
+                                    if count_coconse_found >= 1:
+                                        print('!!! Co-Conse found: ' + conse_setter_id + ' => ' + conse_getter_id)
+                                        if conse_setter_id in known_conses:
+                                            print('- this is a known one, we skip the quick-statement and add a source')
+
+                                            for conse in claim_list_conses:
+                                                myconse = conse.getTarget()
+                                                if myconse.id == conse_setter_id:
+                                                    conse_claim_sources = conse.getSources()
+                                                    if not conse_claim_sources:
+                                                        source_claim = pywikibot.Claim(repo, 'P1047')
+                                                        source_claim.setTarget(mycathid)
+                                                        conse.addSources([source_claim], summary='add catholic-hierarchy as source for consecrator')
+                                            continue
+                                        fq = open(path4qs, "a")
+                                        fq.write("\n" + conse_getter_id +
+                                                 "\tP1598\t" + conse_setter_id + "\tP3831\tQ18442822"
+                                                 "\tS1047\t\"" + mycathid + "\"")
+
+                                        fq.close()
+                                    elif count_conse_found == 0:
+                                        print('-- checking ch.org for co-conse-info: ' + 'http://www.catholic-hierarchy.org/bishop/b' + conse_match.groups()[0] + '.html')
+                                        os.system("./create_by_chorg-id.py " + conse_match.groups()[0] + " create_quick_log.txt")
 
 
 print('Done!')
