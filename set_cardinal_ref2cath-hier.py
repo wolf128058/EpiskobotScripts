@@ -1,15 +1,18 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import progressbar
-import re
 
-import pywikibot
-from pywikibot import pagegenerators as pg
+from random import shuffle
+
+import re
+import progressbar
 
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+
+import pywikibot
+from pywikibot import pagegenerators as pg
 
 
 def requests_retry_session(
@@ -56,16 +59,20 @@ repo = wikidata_site.data_repository()
 with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
     bar.update(0)
     for index, item in enumerate(generator):
-        itemdetails = item.get()
+        itemdetails = item.get(get_redirect=True)
         mycathid = ''
+        mywd_id = item.id
+        print("\n" + '>> Checking WD-ID: ' + mywd_id)
+        print('-- WD-URL: https://www.wikidata.org/wiki/' + mywd_id)
 
         claim_list_position = itemdetails['claims']['P39']
         claim_list_cathid = itemdetails['claims']['P1047']
 
         for cathids in claim_list_cathid:
             mycathid = cathids.getTarget()
-            print('>> Catholic-Hierarchy-Id: ' + mycathid)
-            print('>> URL: https://www.wikidata.org/wiki/' + item.id)
+            chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
+            print('-- Catholic-Hierarchy-Id: ' + mycathid)
+            print('-- URL: ' + chorgurl)
 
         for rel_claim in claim_list_position:
             trgt = rel_claim.getTarget()
@@ -74,7 +81,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
 
                 rel_claim_sources = rel_claim.getSources()
 
-                if len(rel_claim_sources) == 0:
+                if rel_claim_sources:
                     chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
                     r = requests_retry_session().get(chorgurl)
 
