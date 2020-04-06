@@ -12,7 +12,7 @@ import progressbar
 import pywikibot
 from pywikibot import pagegenerators as pg
 
-path4qs = 'log_quick_consefounds.txt'
+path4qs = 'data/log_quick_consefounds.txt'
 
 QUERY = """
 SELECT ?item  ?birthLabel WHERE {
