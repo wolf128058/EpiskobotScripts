@@ -78,7 +78,18 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
 
                 rel_claim_sources = rel_claim.getSources()
 
-                if not rel_claim_sources:
+                has_src_cath = False
+
+                for rel_claim_source in rel_claim_sources:
+
+                    try:
+                        if rel_claim_source['P1047']:
+                            has_src_cath = True
+                            print('-- Catholic Hierarchy as Source found')
+                    except:
+                        pass
+
+                if not rel_claim_sources or has_src_cath == False:
                     chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
                     r = requests_retry_session().get(chorgurl)
 
