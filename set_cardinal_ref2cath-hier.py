@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-
+# pylint: disable=missing-docstring, line-too-long
 
 from random import shuffle
 
