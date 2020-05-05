@@ -405,6 +405,7 @@ agvp
 agyenta
 ahern
 ahernj
+ahiwa
 ahlefeld
 ahmn
 ahn
@@ -2943,6 +2944,7 @@ bazinv
 bazru
 bazt
 bazyuk
+bbrodeur
 bcctl
 bchtl
 bdbdc
@@ -3497,6 +3499,7 @@ bernardj
 bernardm
 bernardp
 bernards
+bernardv
 bernargu
 bernarma
 bernasc
@@ -9867,6 +9870,7 @@ damf
 damian
 damianis
 damiano
+damianoa
 damianos
 damianp
 damico
@@ -10286,6 +10290,7 @@ dchato
 dchemin
 dchemp
 dchi
+dchus
 dciaia
 dciaja
 dciajaa
@@ -10598,6 +10603,7 @@ delia
 delidcd
 delila
 delima
+delimaf
 deliman
 delini
 delisle
@@ -17721,6 +17727,7 @@ hans
 hansen
 hanus
 hanwere
+hanxr
 haou
 hap
 happe
@@ -21628,6 +21635,7 @@ lhayej
 lhayel
 lhc
 lhdm
+lhern
 lheureux
 lhotel
 lht
@@ -21687,6 +21695,7 @@ liguod
 liguori
 lihe
 liht
+lihuiy
 lijingfe
 lika
 likak
@@ -22472,6 +22481,7 @@ lunysara
 luod
 luoni
 luox
+lup
 lupa
 lupari
 lupault
@@ -23751,6 +23761,7 @@ marsd
 marsh
 marshaj
 marshall
+marshalr
 marshll
 marsi
 marsia
@@ -26057,6 +26068,7 @@ mottini
 mottola
 moua
 mouallem
+mouanga
 mouaq
 mouaw
 moubar
@@ -26898,6 +26910,7 @@ nichesog
 nicholl
 nichols
 nicioli
+nicit
 nick
 nico
 nicoa
@@ -31228,6 +31241,7 @@ raimb
 raimbaud
 raimbauh
 raimg
+raimgl
 raiml
 raimondi
 raimondo
@@ -32967,6 +32981,7 @@ rubo
 rubs
 rubw
 rucab
+rucastle
 ruccel
 ruch
 ruck
@@ -36705,6 +36720,7 @@ swarte
 swee
 sweee
 sweeney
+sweeneyk
 sweeneyp
 sweeny
 sweet
@@ -39040,6 +39056,7 @@ vegam
 vegar
 vegavel
 vegc
+vegezzi
 vegg
 veggio
 vegini
@@ -40727,6 +40744,7 @@ yanez
 yanezdm
 yanezj
 yanga
+yangyo
 yanp
 yanta
 yao
