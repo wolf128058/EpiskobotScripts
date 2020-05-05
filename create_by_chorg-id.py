@@ -81,7 +81,7 @@ if r.status_code == 200:
     defline = 'CREATE'
     item_properties += "\nLAST\tP31\tQ5\t"
     item_properties += "\nLAST\tP21\tQ6581097\t"
-    item_properties += "\nLAST\tP140\tQ9592\t"
+    item_properties += "\nLAST\tP140\tQ9592\tS1047\t\"" + mycathid + "\""
     item_properties += "\nLAST\tP1047\t\"" + mycathid + "\"\t"
 
     source = r.content
