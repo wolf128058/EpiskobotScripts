@@ -118,7 +118,6 @@ elif not diocese and dioid:
             print('-- Diocese found: https://www.wikidata.org/wiki/{}'.format(diocese))
         else:
             print('! Length of P1866 (Claim for Catholic Hierarchy diocese ID) !=1')
-            exit()
 
 chorgurl = 'http://www.catholic-hierarchy.org/diocese/d' + dioid + '.html'
 
@@ -194,14 +193,19 @@ for html_row in stat_html_rows:
     if stat_th_in:
         continue
 
-    bytes_regex = str.encode('>([^<]+)<')
+    bytes_regex = str.encode('<td>([^<]*)')
     td_in = re.findall(bytes_regex, html_row)
     if not len(td_in) == len(list_headlines):
         continue
 
-    my_year = int(td_in[yearpos])
-    my_members = int(locale.atoi(td_in[memberpos].decode('utf-8')))
-    a_yearstat_ch[str(my_year)] = my_members
+    try:
+        my_year = int(td_in[yearpos])
+        my_members = int(locale.atoi(td_in[memberpos].decode('utf-8')))
+        if my_members == 0:
+            continue
+        a_yearstat_ch[str(my_year)] = my_members
+    except:
+        continue
 
 
 try:
