@@ -237,6 +237,14 @@ def get_predecessor(officeholder):
                 continue
 
             try:
+                if qualifiers[KEY_SUCCESSOR]:
+                    my_successor = qualifiers[KEY_SUCCESSOR][0].getTarget()
+                    my_successor_id = my_successor.id
+                    print('- Successor: ' + my_successor_id)
+            except:
+                print('- No Successor found. (For ' + officeholder + ' as ' + POSITION + ' of ' + COMMON_PROP_VALUE + ')')
+
+            try:
                 if qualifiers[KEY_PREDECESSOR]:
                     my_predecessor = qualifiers[KEY_PREDECESSOR][0].getTarget()
                     my_predecessor_id = my_predecessor.id
@@ -245,14 +253,6 @@ def get_predecessor(officeholder):
             except:
                 print('- No Predecessor found. (For ' + officeholder + ' as ' + POSITION + ' of ' + COMMON_PROP_VALUE + ')')
                 return False
-
-            try:
-                if qualifiers[KEY_SUCCESSOR]:
-                    my_successor = qualifiers[KEY_SUCCESSOR][0].getTarget()
-                    my_successor_id = my_successor.id
-                    print('- Successor: ' + my_successor_id)
-            except:
-                print('- No Successor found')
 
             if found_predecessor:
                 return my_predecessor_id
