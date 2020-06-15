@@ -4,12 +4,6 @@
 import pywikibot
 from pywikibot import pagegenerators as pg
 
-import os
-from os import system
-
-import re
-import requests
-
 import progressbar
 
 
