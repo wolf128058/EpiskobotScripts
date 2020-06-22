@@ -8,10 +8,34 @@ from random import shuffle
 
 import lxml.html
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
+
 import progressbar
 
 import pywikibot
 from pywikibot import pagegenerators as pg
+
+
+def requests_retry_session(
+        retries=5,
+        backoff_factor=0.3,
+        status_forcelist=(500, 502, 504),
+        session=None,
+):
+    session = session or requests.Session()
+    retry = Retry(
+        total=retries,
+        read=retries,
+        connect=retries,
+        backoff_factor=backoff_factor,
+        status_forcelist=status_forcelist,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+    return session
+
 
 path4qs = 'data/log_quick_consefounds.txt'
 
@@ -19,10 +43,12 @@ QUERY = """
 SELECT ?item  ?birthLabel WHERE {
   ?item wdt:P1047 ?cathi.
   OPTIONAL {?item wdt:P569 ?birth}
- FILTER(EXISTS { ?item wdt:P1598 ?statement. })
+ FILTER( EXISTS { ?item wdt:P1598 ?statement. })
+# FILTER(NOT EXISTS { ?item wdt:P1598 ?statement. })
+#  FILTER((YEAR(?birth)) >= 1584 )
 }
-ORDER BY DESC (?birthLabel)
-LIMIT 5000
+# ORDER BY ASC (?birthLabel)
+# LIMIT 5000
 """
 
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
@@ -65,9 +91,11 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             if not mycathid:
                 continue
             chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
+            r = requests_retry_session().get(chorgurl)
 
             try:
-                r = requests.head(chorgurl)
+                r = requests_retry_session().get(chorgurl)
+                # r = requests.head(chorgurl)
             except:
                 continue
 
