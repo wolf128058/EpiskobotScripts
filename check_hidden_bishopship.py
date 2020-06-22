@@ -40,6 +40,9 @@ def dioid2wd(dioid):
     wikidata_site = pywikibot.Site('wikidata', 'wikidata')
     try:
         generator = pg.WikidataSPARQLPageGenerator(QUERY4DIOID, site=wikidata_site)
+        if len(generator) > 1:
+            print('-- DioId ' + dioid + ' is ambiguous.')
+            return False
         for item in generator:
             item.get(get_redirect=True)
             print('--- WD-Item-4-Diocese found: ' + item.id)
