@@ -216,7 +216,7 @@ if diocese:
         print('! Length of P1866 (Claim for Catholic Hierarchy diocese ID) == ' + str(len(list_currentdioids)))
         exit()
 elif not diocese and dioid:
-    SPARQL = "SELECT ?item WHERE { ?item wdt:P1866 \"" + dioid + "\". }"
+    SPARQL = "SELECT ?item WHERE { ?item p:P1866 ?statement. ?statement ps:P1866 ?dioid. FILTER(?dioid = \"" + dioid + "\")}"
     my_generator = pg.WikidataSPARQLPageGenerator(SPARQL, site=wikidata_site)
     my_generator = list(my_generator)
     if len(my_generator) != 1 and dioid == False:
