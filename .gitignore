@@ -104,3 +104,10 @@ venv.bak/
 .mypy_cache/
 
 .idea/*
+
+# caches
+/apicache-py3/*
+
+# configs
+user-config.py
+user-password.py
