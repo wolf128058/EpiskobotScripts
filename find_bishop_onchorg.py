@@ -83,7 +83,7 @@ for item in generator:
                     is_tagged_archbishop = True
 
             if mytitle.startswith('Bishop '):
-                print(('-- Title match "Bishop": "' + mytitle + '"'))
+                print('-- Title match "Bishop": "' + mytitle + '"')
 
                 for claim_list_position in claim_list_positions:
                     pos_detail = claim_list_position.getTarget()
@@ -101,7 +101,7 @@ for item in generator:
                     print('-- Bishop is on your list.')
 
             if mytitle.startswith('Archbishop '):
-                print(('-- Title match "Archbishop": "' + mytitle + '"'))
+                print('-- Title match "Archbishop": "' + mytitle + '"')
 
                 for claim_list_position in claim_list_positions:
                     pos_detail = claim_list_position.getTarget()
