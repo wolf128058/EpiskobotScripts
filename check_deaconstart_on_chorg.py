@@ -97,7 +97,7 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
         for cathids in claim_list_cathid:
             mycathid = cathids.getTarget()
             print('-- Catholic-Hierarchy-Id: ' + mycathid)
-            chorgurl = 'http://www.catholic-hierarchy.org/deacon/b' + mycathid + '.html'
+            chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
             print('-- Catholic-Hierarchy-URL: ' + chorgurl)
 
             r = requests_retry_session().get(chorgurl)
@@ -105,9 +105,9 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                 print('### HTTP-ERROR ON cath-id: ' + chorgurl)
                 continue
 
-            deacon_tr = re.findall(b'<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained deacon</td>.*</tr>', r.content)
+            deacon_tr = re.findall(b'<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Deacon</td>.*</tr>', r.content)
             if not deacon_tr:
-                deacon_tr = re.findall(b'<tr><td[^>]+>(.*)</td><td>Ordained deacon</td>.*</tr>', r.content)
+                deacon_tr = re.findall(b'<tr><td[^>]+>(.*)</td><td>Ordained Deacon</td>.*</tr>', r.content)
             if deacon_tr:
                 print('-- deacon-Info: ' + deacon_tr[0].decode('utf-8'))
 
