@@ -2,18 +2,11 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=missing-docstring, line-too-long
 
-import sys
-
-import re
-import datetime
+import sys, re
 from datetime import datetime
-
 from urllib import parse
-
 import urllib.parse
-
 import lxml.html
-
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
@@ -46,277 +39,269 @@ def lreplace(pattern, sub, string):
     return re.sub('^%s' % pattern, sub, string)
 
 
-mycathid = sys.argv[1]
-if len(sys.argv) > 0:
+MY_CH_ID = sys.argv[1]
+if sys.argv:
     try:
-        mylogfile = sys.argv[2]
+        MYLOGFILE = sys.argv[2]
     except:
-        mylogfile = ''
-mycreatecode = ''
-item_label = ''
-item_properties = ''
+        MYLOGFILE = ''
 
-chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
+MYCREATECODE = ''
+ITEM_LABEL = ''
+ITEM_PROPERTIES = ''
 
-r = requests_retry_session().get(chorgurl)
-if r.status_code != 200:
-    print('### ERROR ON cath-id: ' + mycathid)
+CH_URL = 'http://www.catholic-hierarchy.org/bishop/b' + MY_CH_ID + '.html'
+
+REQUEST_RESULT = requests_retry_session().get(CH_URL)
+if REQUEST_RESULT.status_code != 200:
+    print('### ERROR ON cath-id: ' + MY_CH_ID)
     quit()
-if r.status_code == 200:
-    wd_query = 'SELECT ?item WHERE {?item wdt:P1047 "' + mycathid + '"}'
-    wikidata_site = pywikibot.Site('wikidata', 'wikidata')
-    generator = pg.WikidataSPARQLPageGenerator(wd_query, site=wikidata_site)
-    wd_matches = 0
-    for item in generator:
-        wd_matches += 1
+if REQUEST_RESULT.status_code == 200:
+    WD_QUERY = 'SELECT ?item WHERE {?item wdt:P1047 "' + MY_CH_ID + '"}'
+    WIKIDATA_SITE = pywikibot.Site('wikidata', 'wikidata')
+    GENERATOR = pg.WikidataSPARQLPageGenerator(WD_QUERY, site=WIKIDATA_SITE)
+    WD_MATCHES = 0
+    for item in GENERATOR:
+        WD_MATCHES += 1
         item_id = item.id
-    if wd_matches > 0:
+    if WD_MATCHES > 0:
         print('### item already exists: https://www.wikidata.org/wiki/' + item_id)
         quit()
 
-    t = lxml.html.parse(chorgurl)
-    mytitle = t.find(".//title").text
-    mytitle = mytitle.replace(' [Catholic-Hierarchy]', '')
-    print('>> Found:' + mytitle + ' [id: ' + mycathid + ']')
-    defline = 'CREATE'
-    item_properties += "\nLAST\tP31\tQ5\t"
-    item_properties += "\nLAST\tP21\tQ6581097\t"
-    item_properties += "\nLAST\tP140\tQ9592\tS1047\t\"" + mycathid + "\""
-    item_properties += "\nLAST\tP1047\t\"" + mycathid + "\"\t"
+    PARSED_SOURCE = lxml.html.parse(CH_URL)
+    MYTITLE = PARSED_SOURCE.find(".//title").text
+    MYTITLE = MYTITLE.replace(' [Catholic-Hierarchy]', '')
+    print('>> Found:' + MYTITLE + ' [id: ' + MY_CH_ID + ']')
+    DEFLINE = 'CREATE'
+    ITEM_PROPERTIES += "\nLAST\tP31\tQ5\t"
+    ITEM_PROPERTIES += "\nLAST\tP21\tQ6581097\t"
+    ITEM_PROPERTIES += "\nLAST\tP140\tQ9592\tS1047\t\"" + MY_CH_ID + "\""
+    ITEM_PROPERTIES += "\nLAST\tP1047\t\"" + MY_CH_ID + "\"\t"
 
-    source = r.content
-    # print source
+    CH_SOURCE = REQUEST_RESULT.content
+    # print CH_SOURCE
 
-# CHECK SOURCE FOR DATES
-    priest_tr = re.findall(b"<tr>.*<td>Ordained Priest</td>.*</tr>", source)
-    if priest_tr:
-        item_properties += "\nLAST\tP106\tQ250867\tS1047\t\"" + mycathid + "\"\t"
+    # CHECK SOURCE FOR DATES
+    PRIEST_TR = re.findall(b"<tr>.*<td>Ordained Priest</td>.*</tr>", CH_SOURCE)
+    if PRIEST_TR:
+        ITEM_PROPERTIES += "\nLAST\tP106\tQ250867\tS1047\t\"" + MY_CH_ID + "\"\t"
 
-# BIRTHDATE
-    birth_datetime = None
+    # BIRTHDATE
+    BIRTH_DATETIME = None
 
-    birth_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*<td>Born</td></tr>", source)
+    BIRTH_TR = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*<td>Born</td></tr>", CH_SOURCE)
 
-    if birth_tr:
-        birth_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>Born</td>.*</tr>", source)
+    if BIRTH_TR:
+        BIRTH_TR = re.findall(b"<tr><td[^>]+>(.*)</td><td>Born</td>.*</tr>", CH_SOURCE)
 
-    if birth_tr:
-        print('-- Birth-Info: ' + birth_tr[0].decode('utf-8'))
-        birth_tr = re.sub(r'\<[^\<]+\>', '', birth_tr[0].decode('utf-8'))
-        birth_tr_circa = re.findall(r"(.*)&sup[0-9];", birth_tr.strip())
+    if BIRTH_TR:
+        print('-- Birth-Info: ' + BIRTH_TR[0].decode('utf-8'))
+        BIRTH_TR = re.sub(r'\<[^\<]+\>', '', BIRTH_TR[0].decode('utf-8'))
+        BIRTH_TR_CIRCA = re.findall(r"(.*)&sup[0-9];", BIRTH_TR.strip())
 
-        if not birth_tr_circa:
+        if not BIRTH_TR_CIRCA:
             try:
-                birth_datetime = datetime.strptime(birth_tr, '%d %b %Y')
-                item_properties += "\nLAST\tP569\t+" + birth_datetime.isoformat() + 'Z/11'
+                BIRTH_DATETIME = datetime.strptime(BIRTH_TR, '%d %b %Y')
+                ITEM_PROPERTIES += "\nLAST\tP569\t+" + BIRTH_DATETIME.isoformat() + 'Z/11'
             except:
-                print('- No valid birthdate (exact day) found: "' + birth_tr + '"')
-        elif len(birth_tr_circa[0]) == 4:
+                print('- No valid birthdate (exact day) found: "' + BIRTH_TR + '"')
+        elif len(BIRTH_TR_CIRCA[0]) == 4:
             try:
-                birth_datetime = datetime.strptime(birth_tr_circa[0], '%Y')
-                item_properties += "\nLAST\tP569\t+" + birth_datetime.isoformat() + 'Z/9' + "\tP1480\tQ5727902"
+                BIRTH_DATETIME = datetime.strptime(BIRTH_TR_CIRCA[0], '%Y')
+                ITEM_PROPERTIES += "\nLAST\tP569\t+" + BIRTH_DATETIME.isoformat() + 'Z/9' + "\tP1480\tQ5727902"
             except:
-                print('- No valid birthdate (~ year) found: "' + birth_tr + '"')
-        elif len(birth_tr_circa[0]) == 8:
+                print('- No valid birthdate (~ year) found: "' + BIRTH_TR + '"')
+        elif len(BIRTH_TR_CIRCA[0]) == 8:
             try:
-                birth_datetime = datetime.strptime(birth_tr_circa[0], '%b %Y')
-                item_properties += "\nLAST\tP569\t+" + birth_datetime.isoformat() + 'Z/10' + "\tP1480\tQ5727902"
+                BIRTH_DATETIME = datetime.strptime(BIRTH_TR_CIRCA[0], '%b %Y')
+                ITEM_PROPERTIES += "\nLAST\tP569\t+" + BIRTH_DATETIME.isoformat() + 'Z/10' + "\tP1480\tQ5727902"
             except:
-                print('- No valid birthdate (~ month) found: "' + birth_tr + '"')
+                print('- No valid birthdate (~ month) found: "' + BIRTH_TR + '"')
         else:
             try:
-                birth_datetime = datetime.strptime(birth_tr_circa[0], '%d %b %Y')
-                item_properties += "\nLAST\tP569\t+" + birth_datetime.isoformat() + 'Z/11' + "\tP1480\tQ5727902"
+                BIRTH_DATETIME = datetime.strptime(BIRTH_TR_CIRCA[0], '%d %b %Y')
+                ITEM_PROPERTIES += "\nLAST\tP569\t+" + BIRTH_DATETIME.isoformat() + 'Z/11' + "\tP1480\tQ5727902"
             except:
-                print('- No valid birthdate (~ day) found: "' + birth_tr_circa[0] + '"')
+                print('- No valid birthdate (~ day) found: "' + BIRTH_TR_CIRCA[0] + '"')
 
-    if birth_datetime == None:
+    if BIRTH_DATETIME is None:
 
-        birth_prop = re.findall(b'.*<time itemprop="birthDate" datetime="([0-9-]+)">.*</time>.*', source)
+        BIRTH_PROP = re.findall(b'.*<time itemprop="birthDate" datetime="([0-9-]+)">.*</time>.*', CH_SOURCE)
 
-        if birth_prop:
-            print('-- Birth-Prop: ' + birth_prop[0].decode('utf-8'))
+        if BIRTH_PROP:
+            print('-- Birth-Prop: ' + BIRTH_PROP[0].decode('utf-8'))
             try:
-                birth_datetime = datetime.strptime(birth_prop[0].decode('utf-8'), '%Y-%m-%d')
-                item_properties += "\nLAST\tP569\t+" + birth_datetime.isoformat() + 'Z/11'
-                print('-- Birth-Prop: ' + birth_prop[0].decode('utf-8'))
+                BIRTH_DATETIME = datetime.strptime(BIRTH_PROP[0].decode('utf-8'), '%Y-%m-%d')
+                ITEM_PROPERTIES += "\nLAST\tP569\t+" + BIRTH_DATETIME.isoformat() + 'Z/11'
+                print('-- Birth-Prop: ' + BIRTH_PROP[0].decode('utf-8'))
             except:
-                print('- No valid birthprop found: "' + birth_prop[0].decode('utf-8') + '"')
+                print('- No valid birthprop found: "' + BIRTH_PROP[0].decode('utf-8') + '"')
 
+    # DEATHDATE
+    DEATH_DATETIME = None
 
-# DEATHDATE
-    death_datetime = None
+    DEATH_TR = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*<td>Died</td>.*</tr>", CH_SOURCE)
+    if DEATH_TR:
+        DEATH_TR = re.findall(b"<tr><td[^>]+>(.*)</td><td>Died</td>.*</tr>", CH_SOURCE)
+    if DEATH_TR:
+        DEATH_TR = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*</td><td>Died</td>.*</tr>", CH_SOURCE)
 
-    death_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*<td>Died</td>.*</tr>", source)
-    if death_tr:
-        death_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>Died</td>.*</tr>", source)
-    if death_tr:
-        death_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*</td><td>Died</td>.*</tr>", source)
+    if DEATH_TR:
+        print('-- Death-Info: ' + DEATH_TR[0].decode('utf-8'))
+        DEATH_TR = re.sub(r'\<[^\<]+>', '', DEATH_TR[0].decode('utf-8'))
+        DEATH_TR_CIRCA = re.findall(r"(.*)&sup[0-9];", DEATH_TR.strip())
 
-    if death_tr:
-        print('-- Death-Info: ' + death_tr[0].decode('utf-8'))
-        death_tr = re.sub(r'\<[^\<]+>', '', death_tr[0].decode('utf-8'))
-        death_tr_circa = re.findall(r"(.*)&sup[0-9];", death_tr.strip())
-
-        if not death_tr_circa:
+        if not DEATH_TR_CIRCA:
             try:
-                death_datetime = datetime.strptime(death_tr, '%d %b %Y')
-                item_properties += "\nLAST\tP570\t+" + death_datetime.isoformat() + 'Z/11'
+                DEATH_DATETIME = datetime.strptime(DEATH_TR, '%d %b %Y')
+                ITEM_PROPERTIES += "\nLAST\tP570\t+" + DEATH_DATETIME.isoformat() + 'Z/11'
             except:
-                print('- No valid deathdate found: "' + death_tr + '"')
-        elif len(death_tr_circa[0]) == 4:
+                print('- No valid deathdate found: "' + DEATH_TR + '"')
+        elif len(DEATH_TR_CIRCA[0]) == 4:
             try:
-                death_datetime = datetime.strptime(death_tr_circa[0], '%Y')
-                item_properties += "\nLAST\tP570\t+" + death_datetime.isoformat() + 'Z/9' + "\tP1480\tQ5727902"
+                DEATH_DATETIME = datetime.strptime(DEATH_TR_CIRCA[0], '%Y')
+                ITEM_PROPERTIES += "\nLAST\tP570\t+" + DEATH_DATETIME.isoformat() + 'Z/9' + "\tP1480\tQ5727902"
             except:
-                print('- No valid deathdate found: "' + death_tr + '"')
-        elif len(death_tr_circa[0]) == 8:
+                print('- No valid deathdate found: "' + DEATH_TR + '"')
+        elif len(DEATH_TR_CIRCA[0]) == 8:
             try:
-                death_datetime = datetime.strptime(death_tr_circa[0], '%b %Y')
-                item_properties += "\nLAST\tP570\t+" + death_datetime.isoformat() + 'Z/10' + "\tP1480\tQ5727902"
+                DEATH_DATETIME = datetime.strptime(DEATH_TR_CIRCA[0], '%b %Y')
+                ITEM_PROPERTIES += "\nLAST\tP570\t+" + DEATH_DATETIME.isoformat() + 'Z/10' + "\tP1480\tQ5727902"
             except:
-                print('- No valid deathdate found: "' + death_tr + '"')
+                print('- No valid deathdate found: "' + DEATH_TR + '"')
         else:
             try:
-                death_datetime = datetime.strptime(death_tr_circa[0], '%d %b %Y')
-                item_properties += "\nLAST\tP570\t+" + death_datetime.isoformat() + 'Z/11' + "\tP1480\tQ5727902"
+                DEATH_DATETIME = datetime.strptime(DEATH_TR_CIRCA[0], '%d %b %Y')
+                ITEM_PROPERTIES += "\nLAST\tP570\t+" + DEATH_DATETIME.isoformat() + 'Z/11' + "\tP1480\tQ5727902"
 
             except:
-                print('- No valid deathdate found: "' + death_tr_circa[0] + '"')
+                print('- No valid deathdate found: "' + DEATH_TR_CIRCA[0] + '"')
 
-    if death_datetime == None:
+    if DEATH_DATETIME is None:
 
-        death_prop = re.findall(b'.*<time itemprop="deathDate" datetime="([0-9-]+)">.*</time>.*', source)
-        if death_prop:
+        DEATH_PROP = re.findall(b'.*<time itemprop="deathDate" datetime="([0-9-]+)">.*</time>.*', CH_SOURCE)
+        if DEATH_PROP:
             try:
-                death_datetime = datetime.strptime(death_prop[0].decode('utf-8'), '%Y-%m-%d')
-                item_properties += "\nLAST\tP570\t+" + death_datetime.isoformat() + 'Z/11'
-                print('-- Death-Prop: ' + death_prop[0].decode('utf-8'))
+                DEATH_DATETIME = datetime.strptime(DEATH_PROP[0].decode('utf-8'), '%Y-%m-%d')
+                ITEM_PROPERTIES += "\nLAST\tP570\t+" + DEATH_DATETIME.isoformat() + 'Z/11'
+                print('-- Death-Prop: ' + DEATH_PROP[0].decode('utf-8'))
             except:
-                print('- No valid deathprop found: "' + death_prop[0].decode('utf-8') + '"')
+                print('- No valid deathprop found: "' + DEATH_PROP[0].decode('utf-8') + '"')
 
-    mytitle = re.sub(r'\([^)]*\)', '', mytitle)
-    mytitle = re.sub(r"\s\s+", " ", mytitle)
-    mytitle = mytitle.strip()
+    MYTITLE = re.sub(r'\([^)]*\)', '', MYTITLE)
+    MYTITLE = re.sub(r"\s\s+", " ", MYTITLE)
+    MYTITLE = MYTITLE.strip()
 
-    if mytitle.startswith('Bishop '):
-        item_properties += "\nLAST\tP39\tQ611644\tS1047\t\"" + mycathid + "\"\t"
-        defline += "\nLAST\tDde\t\"Bischof der römisch-katholischen Kirche\""
-        defline += "\nLAST\tDen\t\"bishop of the roman-catholic church\""
-        defline += "\nLAST\tDit\t\"vescovo cattolico\""
-        defline += "\nLAST\tDfr\t\"évêque catholique\""
-        defline += "\nLAST\tDpl\t\"biskup katolicki\""
-        defline += "\nLAST\tDla\t\"episcopus catholicus\""
-        defline += "\nLAST\tDca\t\"bisbe catòlic\""
-        defline += "\nLAST\tDes\t\"obispo católico\""
-        defline += "\nLAST\tDnl\t\"katholiek bisschop\""
-        item_label = lreplace('Bishop ', '', mytitle)
-        defline += "\nLAST\tLde\t\"" + item_label + "\""
-        defline += "\nLAST\tLen\t\"" + item_label + "\""
+    if MYTITLE.startswith('Bishop '):
+        ITEM_PROPERTIES += "\nLAST\tP39\tQ611644\tS1047\t\"" + MY_CH_ID + "\"\t"
+        DEFLINE += "\nLAST\tDde\t\"Bischof der römisch-katholischen Kirche\""
+        DEFLINE += "\nLAST\tDen\t\"bishop of the roman-catholic church\""
+        DEFLINE += "\nLAST\tDit\t\"vescovo cattolico\""
+        DEFLINE += "\nLAST\tDfr\t\"évêque catholique\""
+        DEFLINE += "\nLAST\tDpl\t\"biskup katolicki\""
+        DEFLINE += "\nLAST\tDla\t\"episcopus catholicus\""
+        DEFLINE += "\nLAST\tDca\t\"bisbe catòlic\""
+        DEFLINE += "\nLAST\tDes\t\"obispo católico\""
+        DEFLINE += "\nLAST\tDnl\t\"katholiek bisschop\""
+        ITEM_LABEL = lreplace('Bishop ', '', MYTITLE)
+        DEFLINE += "\nLAST\tLde\t\"" + ITEM_LABEL + "\""
+        DEFLINE += "\nLAST\tLen\t\"" + ITEM_LABEL + "\""
 
-    elif mytitle.startswith('Constitutional Bishop '):
-        item_properties += "\nLAST\tP39\tQ1782975\t"
-        defline += "\nLAST\tDde\t\"konstitutioneller Bischof\""
-        defline += "\nLAST\tDen\t\"constitutional bishop\""
-        defline += "\nLAST\tDit\t\"vescovo costituzionale\""
-        defline += "\nLAST\tDfr\t\"évêque constitutionnel\""
-        defline += "\nLAST\tDpl\t\"biskup konstytucyjny\""
-        defline += "\nLAST\tDes\t\"obispo constitucional\""
-        item_label = lreplace('Constitutional Bishop ', '', mytitle)
-        defline += "\nLAST\tLde\t\"" + item_label + "\""
-        defline += "\nLAST\tLen\t\"" + item_label + "\""
+    elif MYTITLE.startswith('Constitutional Bishop '):
+        ITEM_PROPERTIES += "\nLAST\tP39\tQ1782975\t"
+        DEFLINE += "\nLAST\tDde\t\"konstitutioneller Bischof\""
+        DEFLINE += "\nLAST\tDen\t\"constitutional bishop\""
+        DEFLINE += "\nLAST\tDit\t\"vescovo costituzionale\""
+        DEFLINE += "\nLAST\tDfr\t\"évêque constitutionnel\""
+        DEFLINE += "\nLAST\tDpl\t\"biskup konstytucyjny\""
+        DEFLINE += "\nLAST\tDes\t\"obispo constitucional\""
+        ITEM_LABEL = lreplace('Constitutional Bishop ', '', MYTITLE)
+        DEFLINE += "\nLAST\tLde\t\"" + ITEM_LABEL + "\""
+        DEFLINE += "\nLAST\tLen\t\"" + ITEM_LABEL + "\""
 
-    elif mytitle.startswith('Archbishop '):
-        item_properties += "\nLAST\tP39\tQ48629921\tS1047\t\"" + mycathid + "\"\t"
-        defline += "\nLAST\tDde\t\"Erzbischof der römisch-katholischen Kirche\""
-        defline += "\nLAST\tDen\t\"archbishop of the roman-catholic church\""
-        defline += "\nLAST\tDit\t\"arcivescovo cattolico\""
-        defline += "\nLAST\tDes\t\"arzobispo católico\""
-        defline += "\nLAST\tDfr\t\"archevêque catholique\""
-        defline += "\nLAST\tDla\t\"archiepiscopus catholicus\""
-        item_label = lreplace('Archbishop ', '', mytitle)
-        defline += "\nLAST\tLde\t\"" + item_label + "\""
-        defline += "\nLAST\tLen\t\"" + item_label + "\""
+    elif MYTITLE.startswith('Archbishop '):
+        ITEM_PROPERTIES += "\nLAST\tP39\tQ48629921\tS1047\t\"" + MY_CH_ID + "\"\t"
+        DEFLINE += "\nLAST\tDde\t\"Erzbischof der römisch-katholischen Kirche\""
+        DEFLINE += "\nLAST\tDen\t\"archbishop of the roman-catholic church\""
+        DEFLINE += "\nLAST\tDit\t\"arcivescovo cattolico\""
+        DEFLINE += "\nLAST\tDes\t\"arzobispo católico\""
+        DEFLINE += "\nLAST\tDfr\t\"archevêque catholique\""
+        DEFLINE += "\nLAST\tDla\t\"archiepiscopus catholicus\""
+        ITEM_LABEL = lreplace('Archbishop ', '', MYTITLE)
+        DEFLINE += "\nLAST\tLde\t\"" + ITEM_LABEL + "\""
+        DEFLINE += "\nLAST\tLen\t\"" + ITEM_LABEL + "\""
 
-    elif mytitle.startswith('Patriarch '):
-        item_properties += "\nLAST\tP39\tQ171692\t"
-        defline += "\nLAST\tDde\t\"römisch-katholischer Patriarch\""
-        defline += "\nLAST\tDen\t\"roman-catholic patriarch\""
-        item_label = lreplace('Patriarch ', '', mytitle)
-        defline += "\nLAST\tLde\t\"" + item_label + "\""
-        defline += "\nLAST\tLen\t\"" + item_label + "\""
+    elif MYTITLE.startswith('Patriarch '):
+        ITEM_PROPERTIES += "\nLAST\tP39\tQ171692\t"
+        DEFLINE += "\nLAST\tDde\t\"römisch-katholischer Patriarch\""
+        DEFLINE += "\nLAST\tDen\t\"roman-catholic patriarch\""
+        ITEM_LABEL = lreplace('Patriarch ', '', MYTITLE)
+        DEFLINE += "\nLAST\tLde\t\"" + ITEM_LABEL + "\""
+        DEFLINE += "\nLAST\tLen\t\"" + ITEM_LABEL + "\""
 
-    elif mytitle.startswith('Father '):
-        defline += "\nLAST\tDde\t\"römisch-katholischer Geistlicher\""
-        defline += "\nLAST\tDen\t\"roman-catholic clergyman \""
-        item_label = lreplace('Father ', '', mytitle)
-        defline += "\nLAST\tLde\t\"" + item_label + "\""
-        defline += "\nLAST\tLen\t\"" + item_label + "\""
+    elif MYTITLE.startswith('Father '):
+        DEFLINE += "\nLAST\tDde\t\"römisch-katholischer Geistlicher\""
+        DEFLINE += "\nLAST\tDen\t\"roman-catholic clergyman \""
+        ITEM_LABEL = lreplace('Father ', '', MYTITLE)
+        DEFLINE += "\nLAST\tLde\t\"" + ITEM_LABEL + "\""
+        DEFLINE += "\nLAST\tLen\t\"" + ITEM_LABEL + "\""
 
-    elif mytitle.startswith('Abbot '):
-        item_properties += "\nLAST\tP39\tQ103163\tS1047\t\"" + mycathid + "\"\t"
-        defline += "\nLAST\tDde\t\"römisch-katholischer Abt\""
-        defline += "\nLAST\tDen\t\"roman-catholic abbot\""
-        defline += "\nLAST\tDit\t\"abad cattolico\""
-        defline += "\nLAST\tDes\t\"arzobispo católico\""
-        defline += "\nLAST\tDfr\t\"abbé catholique\""
-        defline += "\nLAST\tDla\t\"abbas catholicus\""
-        item_label = lreplace('Abbot ', '', mytitle)
-        defline += "\nLAST\tLde\t\"" + item_label + "\""
-        defline += "\nLAST\tLen\t\"" + item_label + "\""
+    elif MYTITLE.startswith('Abbot '):
+        ITEM_PROPERTIES += "\nLAST\tP39\tQ103163\tS1047\t\"" + MY_CH_ID + "\"\t"
+        DEFLINE += "\nLAST\tDde\t\"römisch-katholischer Abt\""
+        DEFLINE += "\nLAST\tDen\t\"roman-catholic abbot\""
+        DEFLINE += "\nLAST\tDit\t\"abad cattolico\""
+        DEFLINE += "\nLAST\tDes\t\"arzobispo católico\""
+        DEFLINE += "\nLAST\tDfr\t\"abbé catholique\""
+        DEFLINE += "\nLAST\tDla\t\"abbas catholicus\""
+        ITEM_LABEL = lreplace('Abbot ', '', MYTITLE)
+        DEFLINE += "\nLAST\tLde\t\"" + ITEM_LABEL + "\""
+        DEFLINE += "\nLAST\tLen\t\"" + ITEM_LABEL + "\""
 
-    elif mytitle.find('Cardinal ') != -1:
-        item_properties += "\nLAST\tP39\tQ45722\tS1047\t\"" + mycathid + "\"\t"
-        defline += "\nLAST\tDde\t\"Kardinal der römisch-katholischen Kirche\""
-        defline += "\nLAST\tDen\t\"cardinal of the roman-catholic church\""
-        defline += "\nLAST\tDit\t\"cardinale cattolico\""
-        defline += "\nLAST\tDes\t\"cardenal católico\""
-        defline += "\nLAST\tDfr\t\"cardinal catholique\""
-        defline += "\nLAST\tDla\t\"cardinalis catholicus\""
-        item_label = mytitle.replace('Cardinal ', '')
-        defline += "\nLAST\tLde\t\"" + item_label + "\""
-        defline += "\nLAST\tLen\t\"" + item_label + "\""
+    elif MYTITLE.find('Cardinal ') != -1:
+        ITEM_PROPERTIES += "\nLAST\tP39\tQ45722\tS1047\t\"" + MY_CH_ID + "\"\t"
+        DEFLINE += "\nLAST\tDde\t\"Kardinal der römisch-katholischen Kirche\""
+        DEFLINE += "\nLAST\tDen\t\"cardinal of the roman-catholic church\""
+        DEFLINE += "\nLAST\tDit\t\"cardinale cattolico\""
+        DEFLINE += "\nLAST\tDes\t\"cardenal católico\""
+        DEFLINE += "\nLAST\tDfr\t\"cardinal catholique\""
+        DEFLINE += "\nLAST\tDla\t\"cardinalis catholicus\""
+        ITEM_LABEL = MYTITLE.replace('Cardinal ', '')
+        DEFLINE += "\nLAST\tLde\t\"" + ITEM_LABEL + "\""
+        DEFLINE += "\nLAST\tLen\t\"" + ITEM_LABEL + "\""
 
-    elif mytitle.find('Patriotic Bishop ') != -1:
-        item_properties += "\nLAST\tP39\tQ611644\tS1047\t\"" + mycathid + "\"\t"
-        defline += "\nLAST\tDde\t\"Patriotischer Bischof\""
-        defline += "\nLAST\tDen\t\"patriotic bishop\""
-        item_label = mytitle.replace('Patriotic Bishop ', '')
-        defline += "\nLAST\tLde\t\"" + item_label + "\""
-        defline += "\nLAST\tLen\t\"" + item_label + "\""
+    elif MYTITLE.find('Patriotic Bishop ') != -1:
+        ITEM_PROPERTIES += "\nLAST\tP39\tQ611644\tS1047\t\"" + MY_CH_ID + "\"\t"
+        DEFLINE += "\nLAST\tDde\t\"Patriotischer Bischof\""
+        DEFLINE += "\nLAST\tDen\t\"patriotic bishop\""
+        ITEM_LABEL = MYTITLE.replace('Patriotic Bishop ', '')
+        DEFLINE += "\nLAST\tLde\t\"" + ITEM_LABEL + "\""
+        DEFLINE += "\nLAST\tLen\t\"" + ITEM_LABEL + "\""
 
     else:
-        quit('--- unknown job on "' + mytitle + '" ---')
+        quit('--- unknown job on "' + MYTITLE + '" ---')
 
-    defline += "\t" + item_properties
+    DEFLINE += "\t" + ITEM_PROPERTIES
 
-    quickurl = 'https://tools.wmflabs.org/quickstatements/api.php?'
-    quickurl += 'action=import'
-    quickurl += '&submit=1'
-    quickurl += '&username=USEYOUROWNUSERNAME'
-    quickurl += '&token=USEYOUROWNTOKEN'
-    quickurl += '&format=v1'
-    quickurl += '&batchname=create-' + mycathid
-    quickurl += '&data=' + urllib.parse.quote(defline, safe='')
-    quickurl += '&compress=0'
-    quickurl += '&site=wikidata'
-    quickurl += ''
+    QUICKURL = 'https://tools.wmflabs.org/quickstatements/api.php?'
+    QUICKURL += 'action=import'
+    QUICKURL += '&submit=1'
+    QUICKURL += '&username=USEYOUROWNUSERNAME'
+    QUICKURL += '&token=USEYOUROWNTOKEN'
+    QUICKURL += '&format=v1'
+    QUICKURL += '&batchname=create-' + MY_CH_ID
+    QUICKURL += '&data=' + urllib.parse.quote(DEFLINE, safe='')
+    QUICKURL += '&compress=0'
+    QUICKURL += '&site=wikidata'
+    QUICKURL += ''
 
-    split_url = parse.urlsplit(quickurl)
+    SPLIT_URL = parse.urlsplit(QUICKURL)
 
-    r = requests.post(split_url.scheme + "://" + split_url.netloc + split_url.path, data=dict(parse.parse_qsl(parse.urlsplit(quickurl).query)))
+    if MYLOGFILE:
+        FILE_LOG = open(MYLOGFILE, "a")
+        FILE_LOG.write("\n\n" + DEFLINE)
+        FILE_LOG.close()
 
-    if r.text['status'] == 'OK':
-        print('- Creation initiated automatically: See https://tools.wmflabs.org/quickstatements/#/batch/' + r.text['batch_id'] + ' for status.')
-    else:
-        print('>> Error on batch submission: Try Url:')
-        print('>> ' + quickurl)
-
-        if mylogfile:
-            fq = open(mylogfile, "a")
-            fq.write("\n\n" + defline)
-            fq.close()
-
-        print("\n\n" + defline + "\n\n")
+    print("\n\n" + DEFLINE + "\n\n")
 
 print('  Done!')
