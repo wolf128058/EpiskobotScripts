@@ -2,10 +2,13 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=missing-docstring, line-too-long
 
-import sys, re
+import re
+import sys
+import configparser
+import urllib.parse
 from datetime import datetime
 from urllib import parse
-import urllib.parse
+
 import lxml.html
 import requests
 from requests.adapters import HTTPAdapter
@@ -49,6 +52,8 @@ if sys.argv:
 MYCREATECODE = ''
 ITEM_LABEL = ''
 ITEM_PROPERTIES = ''
+CONFIG = configparser.ConfigParser()
+CONFIG.read('data/.credentials.ini')
 
 CH_URL = 'http://www.catholic-hierarchy.org/bishop/b' + MY_CH_ID + '.html'
 
@@ -286,8 +291,8 @@ if REQUEST_RESULT.status_code == 200:
     QUICKURL = 'https://tools.wmflabs.org/quickstatements/api.php?'
     QUICKURL += 'action=import'
     QUICKURL += '&submit=1'
-    QUICKURL += '&username=USEYOUROWNUSERNAME'
-    QUICKURL += '&token=USEYOUROWNTOKEN'
+    QUICKURL += '&username=' + CONFIG['tools.wmflabs.org']['username']
+    QUICKURL += '&token=' + CONFIG['tools.wmflabs.org']['token']
     QUICKURL += '&format=v1'
     QUICKURL += '&batchname=create-' + MY_CH_ID
     QUICKURL += '&data=' + urllib.parse.quote(DEFLINE, safe='')
