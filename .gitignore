@@ -108,6 +108,8 @@ venv.bak/
 # caches
 /apicache-py3/*
 
-# configs
+# configs and controls
 user-config.py
 user-password.py
+throttle.ctrl
+pywikibot.lwp
