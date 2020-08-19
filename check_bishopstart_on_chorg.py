@@ -4,9 +4,14 @@
 
 import re
 from random import shuffle
+import configparser
 
-import datetime
 from datetime import datetime
+
+from urllib import parse
+
+import urllib.parse
+import json
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -38,7 +43,10 @@ def requests_retry_session(
     return session
 
 
-wikidata_site = pywikibot.Site('wikidata', 'wikidata')
+CONFIG = configparser.ConfigParser()
+CONFIG.read('data/.credentials.ini')
+
+WIKIDATA_SITE = pywikibot.Site('wikidata', 'wikidata')
 QUERY_WITHOUT_START = """
 SELECT ?item ?itemLabel ?cathid WHERE {
   ?item p:P39 ?position;
@@ -47,16 +55,16 @@ SELECT ?item ?itemLabel ?cathid WHERE {
   FILTER(NOT EXISTS { ?position pq:P580 ?start. })
 }
 """
-path4qs = 'data/log_quick_bishopstarts.txt'
-generator = pg.WikidataSPARQLPageGenerator(QUERY_WITHOUT_START, site=wikidata_site)
-generator = list(generator)
-shuffle(generator)
-item_properties = ''
-count_props = 0
+PATH_QSLOG = 'data/log_quick_bishopstarts.txt'
+GENERATOR = pg.WikidataSPARQLPageGenerator(QUERY_WITHOUT_START, site=WIKIDATA_SITE)
+GENERATOR = list(GENERATOR)
+shuffle(GENERATOR)
+ITEM_PROPERTIES = ''
+COUNT_PROPS = 0
 
-with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
+with progressbar.ProgressBar(max_value=len(GENERATOR), redirect_stdout=True) as bar:
     bar.update(0)
-    for index, item in enumerate(generator):
+    for index, item in enumerate(GENERATOR):
         bar.update(index)
         mywd = item.get(get_redirect=True)
         mywd_id = item.id
@@ -100,14 +108,14 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
             chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
             print('-- Catholic-Hierarchy-URL: ' + chorgurl)
 
-            r = requests_retry_session().get(chorgurl)
-            if r.status_code != 200:
+            REQUEST_RESULT = requests_retry_session().get(chorgurl)
+            if REQUEST_RESULT.status_code != 200:
                 print('### HTTP-ERROR ON cath-id: ' + chorgurl)
                 continue
 
-            bishop_tr = re.findall(b'<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Bishop</td>.*</tr>', r.content)
+            bishop_tr = re.findall(b'<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Bishop</td>.*</tr>', REQUEST_RESULT.content)
             if not bishop_tr:
-                bishop_tr = re.findall(b'<tr><td[^>]+>(.*)</td><td>Ordained Bishop</td>.*</tr>', r.content)
+                bishop_tr = re.findall(b'<tr><td[^>]+>(.*)</td><td>Ordained Bishop</td>.*</tr>', REQUEST_RESULT.content)
             if bishop_tr:
                 print('-- Bishop-Info: ' + bishop_tr[0].decode('utf-8'))
 
@@ -128,45 +136,81 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
 
                 try:
                     bishopstart_datetime = datetime.strptime(bishop_tr_clean.strip(), '%d %b %Y')
-                    item_properties += "\n" + mywd_id + "\tP39\tQ611644\tP580\t+" + bishopstart_datetime.isoformat() + 'Z/11' + "\tS1047\t\"" + mycathid + "\"\t"
-                    count_props += 1
+                    ITEM_PROPERTIES += "\n" + mywd_id + "\tP39\tQ611644\tP580\t+" \
+                                       + bishopstart_datetime.isoformat() + 'Z/11' + "\tS1047\t\"" + mycathid + "\"\t"
+                    COUNT_PROPS += 1
                 except:
                     print('- No valid startdate (precision day) found: "' + bishop_tr_clean + '"')
                     try:
                         bishopstart_datetime = datetime.strptime(bishop_tr_clean.strip(), '%b %Y')
-                        item_properties += "\n" + mywd_id + "\tP39\tQ611644\tP580\t+" + bishopstart_datetime.isoformat() + 'Z/10' + "\tS1047\t\"" + mycathid + "\"\t"
-                        count_props += 1
+                        ITEM_PROPERTIES += "\n" + mywd_id + "\tP39\tQ611644\tP580\t+" \
+                                           + bishopstart_datetime.isoformat() + 'Z/10' + "\tS1047\t\"" + mycathid + "\"\t"
+                        COUNT_PROPS += 1
                     except:
                         print('- No valid startdate (precision month) found: "' + bishop_tr_clean + '"')
                         try:
                             bishopstart_datetime = datetime.strptime(bishop_tr_clean.strip(), '%Y')
-                            item_properties += "\n" + mywd_id + "\tP39\tQ611644\tP580\t+" + bishopstart_datetime.isoformat() + 'Z/9' + "\tS1047\t\"" + mycathid + "\"\t"
-                            count_props += 1
+                            ITEM_PROPERTIES += "\n" + mywd_id + "\tP39\tQ611644\tP580\t+" \
+                                               + bishopstart_datetime.isoformat() + 'Z/9' \
+                                               + "\tS1047\t\"" + mycathid + "\"\t"
+                            COUNT_PROPS += 1
                         except:
                             print('- No valid startdate (precision year) found: "' + bishop_tr_clean + '"')
 
             else:
                 try:
                     bishopstart_datetime = datetime.strptime(bishop_tr_circa[0].strip(), '%d %b %Y')
-                    item_properties += "\n" + mywd_id + "\tP39\tQ611644\tP580\t+" + bishopstart_datetime.isoformat() + 'Z/11' + "\tP1480\tQ5727902" + "\tS1047\t\"" + mycathid + "\"\t"
-                    count_props += 1
+                    ITEM_PROPERTIES += "\n" + mywd_id + "\tP39\tQ611644\tP580\t+" + bishopstart_datetime.isoformat() \
+                                       + 'Z/11' + "\tP1480\tQ5727902" + "\tS1047\t\"" + mycathid + "\"\t"
+                    COUNT_PROPS += 1
                 except:
                     print('- No valid ~startdate (precision day) found: "' + bishop_tr_circa[0].strip() + '"')
                     try:
                         bishopstart_datetime = datetime.strptime(bishop_tr_circa[0].strip(), '%b %Y')
-                        item_properties += "\n" + mywd_id + "\tP39\tQ611644\tP580\t+" + bishopstart_datetime.isoformat() + 'Z/10' + "\tP1480\tQ5727902" + "\tS1047\t\"" + mycathid + "\"\t"
-                        count_props += 1
+                        ITEM_PROPERTIES += "\n" + mywd_id + "\tP39\tQ611644\tP580\t+" \
+                                           + bishopstart_datetime.isoformat() + 'Z/10' + "\tP1480\tQ5727902" + "\tS1047\t\"" + mycathid + "\"\t"
+                        COUNT_PROPS += 1
                     except:
                         print('- No valid ~startdate (precision month) found: "' + bishop_tr_circa[0].strip() + '"')
                         try:
                             bishopstart_datetime = datetime.strptime(bishop_tr_circa[0].strip(), '%Y')
-                            item_properties += "\n" + mywd_id + "\tP39\tQ611644\tP580\t+" + bishopstart_datetime.isoformat() + 'Z/9' + "\tP1480\tQ5727902" + "\tS1047\t\"" + mycathid + "\"\t"
-                            count_props += 1
+                            ITEM_PROPERTIES += "\n" + mywd_id + "\tP39\tQ611644\tP580\t+" \
+                                               + bishopstart_datetime.isoformat() + 'Z/9' + "\tP1480\tQ5727902" \
+                                               + "\tS1047\t\"" + mycathid + "\"\t"
+                            COUNT_PROPS += 1
                         except:
                             print('- No valid ~startdate (precision year) found: "' + bishop_tr_circa[0].strip() + '"')
-        fq = open(path4qs, "a")
-        fq.write(item_properties)
-        fq.close()
-        item_properties = ''
+
+    QUICKURL = 'https://tools.wmflabs.org/quickstatements/api.php?'
+    QUICKURL += 'action=import'
+    QUICKURL += '&submit=1'
+    QUICKURL += '&username=' + CONFIG['tools.wmflabs.org']['username']
+    QUICKURL += '&token=' + CONFIG['tools.wmflabs.org']['token']
+    QUICKURL += '&format=v1'
+    QUICKURL += '&batchname=bishopstart-' + mycathid
+    QUICKURL += '&data=' + urllib.parse.quote(ITEM_PROPERTIES, safe='')
+    QUICKURL += '&compress=0'
+    QUICKURL += '&site=wikidata'
+    QUICKURL += ''
+
+    SPLIT_URL = parse.urlsplit(QUICKURL)
+
+    REQUEST_RESULT = requests.post(SPLIT_URL.scheme + "://" + SPLIT_URL.netloc + SPLIT_URL.path, data=dict(parse.parse_qsl(parse.urlsplit(QUICKURL).query)))
+
+    PARSED_TEXT = REQUEST_RESULT.text
+    if not isinstance(REQUEST_RESULT.text, dict):
+        JSON_ACCEPTABLE_STRING = REQUEST_RESULT.text.replace("'", "\"")
+        PARSED_TEXT = json.loads(JSON_ACCEPTABLE_STRING)
+
+    if PARSED_TEXT['status'] and PARSED_TEXT['status'] == 'OK':
+        print('- Creation initiated automatically: See https://tools.wmflabs.org/quickstatements/#/batch/' + str(
+            PARSED_TEXT['batch_id']) + ' for status.')
+    else:
+        print('>> Error on batch submission: Try Url:')
+        print('>> ' + QUICKURL)
+        LOG_FILE = open(PATH_QSLOG, "a")
+        LOG_FILE.write(ITEM_PROPERTIES)
+        LOG_FILE.close()
+        ITEM_PROPERTIES = ''
 
 print('Done!' + "\n")
