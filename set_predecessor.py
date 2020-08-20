@@ -375,7 +375,10 @@ if officeholder_ch.encode('utf-8') in list_ordinaries_entries:
                     result = set_predecessor(officeholder, position, 'P708', diocese, predecessor_id)
                     if result:
                         if automode:
-                            os.system('python3 set_predecessor.py -i ' + dioid + ' -o ' + officeholder + ' -p ' + position + ' -a ' + str(automode))
+                            if dioid:
+                                os.system('python3 set_predecessor.py -d ' + diocese + ' -i ' + dioid + ' -o ' + officeholder + ' -p ' + position + ' -a ' + str(automode))
+                            else:
+                                os.system('python3 set_predecessor.py -d ' + diocese + ' -o ' + officeholder + ' -p ' + position + ' -a ' + str(automode))
                         exit()
                     else:
                         print('-- Error on setting predecessorship.')
