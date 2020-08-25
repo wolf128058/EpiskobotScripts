@@ -1845,6 +1845,7 @@ ascalesi
 ascarg
 asce
 ascelin
+ascelina
 ascencio
 ascgar
 asch
@@ -11646,6 +11647,7 @@ djoliba
 djom
 djou
 djunk
+djura
 dker
 dlambert
 dlamini
@@ -13074,6 +13076,7 @@ elega
 eleta
 eleuther
 elfc
+elfd
 elfe
 elfg
 elfh
@@ -13084,6 +13087,7 @@ elfn
 elfo
 elford
 elfrc
+elfric
 elfw
 elfwd
 elfwg
@@ -13102,6 +13106,7 @@ eliev
 elievi
 elievii
 elimil
+elinand
 eliner
 elio
 elisei
@@ -33613,6 +33618,7 @@ roquez
 rora
 rordr
 rori
+roricone
 roriz
 roro
 roroc
