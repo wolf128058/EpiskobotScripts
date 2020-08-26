@@ -43,7 +43,6 @@ QUERY_WITHOUT_START = """
 SELECT ?item WHERE {
   ?item wdt:P1047 ?cathi.
   FILTER(NOT EXISTS { ?item wdt:P106 wd:Q250867. })
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
 }
 """
 
