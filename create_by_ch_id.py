@@ -70,7 +70,7 @@ if REQUEST_RESULT.status_code == 200:
         WD_MATCHES += 1
         item_id = item.id
     if WD_MATCHES > 0:
-        print('### item already exists: https://www.wikidata.org/wiki/' + item_id)
+        print('### item "' + MY_CH_ID + '" already exists: https://www.wikidata.org/wiki/' + item_id)
         quit()
 
     PARSED_SOURCE = lxml.html.parse(CH_URL)
