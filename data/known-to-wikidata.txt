@@ -1168,6 +1168,7 @@ andrae
 andrai
 andras
 andre
+andrea
 andreaal
 andreae
 andreag
@@ -5415,6 +5416,7 @@ brisel
 brisg
 brislin
 brit
+britius
 brito
 britoev
 britos
@@ -22364,6 +22366,7 @@ leonpi
 leonrdb
 leonrdc
 leonrdf
+leonrdo
 leonrds
 leonrdt
 leonrod
@@ -23648,6 +23651,7 @@ macedoa
 macedon
 macedong
 macegan
+macegane
 maceira
 macerat
 macerata
