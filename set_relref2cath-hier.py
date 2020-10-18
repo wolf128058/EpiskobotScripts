@@ -1,16 +1,17 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import progressbar
+import datetime
+from random import shuffle
 
-import pywikibot
-from pywikibot import pagegenerators as pg
+import progressbar
 
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-from random import shuffle
+import pywikibot
+from pywikibot import pagegenerators as pg
 
 
 def requests_retry_session(
@@ -46,11 +47,9 @@ SELECT ?item ?itemLabel ?religion ?cathid WHERE {
 '''
 
 wikidata_site = pywikibot.Site('wikidata', 'wikidata')
-
 generator = pg.WikidataSPARQLPageGenerator(QUERY, site=wikidata_site)
 generator = list(generator)
 shuffle(generator)
-
 repo = wikidata_site.data_repository()
 
 with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
@@ -64,6 +63,14 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
 
         claim_list_religion = itemdetails['claims']['P140']
         claim_list_cathid = itemdetails['claims']['P1047']
+
+        now = datetime.datetime.utcnow()
+        my_date4wd = pywikibot.WbTime(
+            year=now.year,
+            month=now.month,
+            day=now.day,
+            precision=11,
+            calendarmodel='http://www.wikidata.org/entity/Q1985727')
 
         for cathids in claim_list_cathid:
             mycathid = cathids.getTarget()
@@ -81,9 +88,16 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                     r = requests_retry_session().head(chorgurl)
                     if r.status_code == 200:
                         print('-- Status 200 received for: ' + chorgurl)
-                        source_claim = pywikibot.Claim(repo, 'P1047')
-                        source_claim.setTarget(mycathid)
-                        rel_claim.addSources([source_claim], summary='add catholic-hierarchy as source for religion')
+                        source_claim_statedin = pywikibot.Claim(repo, 'P248')
+                        source_claim_statedin.setTarget(pywikibot.ItemPage(repo, 'Q3892772'))
+                        source_claim_catid = pywikibot.Claim(repo, 'P1047')
+                        source_claim_catid.setTarget(mycathid)
+                        source_claim_retrieved = pywikibot.Claim(repo, 'P813')
+                        source_claim_retrieved.setTarget(my_date4wd)
+                        rel_claim.addSources(
+                            [source_claim_statedin, source_claim_catid, source_claim_retrieved],
+                            summary='add catholic-hierarchy as source for religion')
+
                 else:
                     cath_id_src = False
                     for rel_claim_source in rel_claim_sources:
@@ -94,13 +108,21 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                             print('--- Cath-Id-Src found')
                         except:
                             print('--- Other than Cath-Id-Src found')
-                    if(cath_id_src == False):
+
+                    if cath_id_src == False:
                         r = requests_retry_session().head(chorgurl)
                         if r.status_code == 200:
                             print('-- Status 200 received for: ' + chorgurl)
-                            source_claim = pywikibot.Claim(repo, 'P1047')
-                            source_claim.setTarget(mycathid)
-                            rel_claim.addSources([source_claim], summary='add catholic-hierarchy as source for religion')
+                            source_claim_statedin = pywikibot.Claim(repo, 'P248')
+                            source_claim_statedin.setTarget(pywikibot.ItemPage(repo, 'Q3892772'))
+                            source_claim_catid = pywikibot.Claim(repo, 'P1047')
+                            source_claim_catid.setTarget(mycathid)
+                            source_claim_retrieved = pywikibot.Claim(repo, 'P813')
+                            source_claim_retrieved.setTarget(my_date4wd)
+                            rel_claim.addSources(
+                                [source_claim_statedin, source_claim_catid, source_claim_retrieved],
+                                summary='add catholic-hierarchy as source for religion')
+
         bar.update(index)
 
 print('Done!')
