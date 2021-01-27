@@ -4,9 +4,8 @@
 
 import os
 import re
-import locale
-
 import sys
+
 import getopt
 
 import requests
