@@ -110,8 +110,7 @@ def main():
 
                     if len(job_claim_sources) == 0:
                         r = requests_retry_session().get(chorgurl)
-                        priest_tr = []
-                        priest_tr.append(re.findall(b"<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Priest</td>.*</tr>", r.content))                            
+                        priest_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Priest</td>.*</tr>", r.content)
 
                         if r.status_code == 200 and len(priest_tr) > 0:
                             print('-- Status 200 received for: ' + chorgurl)
@@ -148,8 +147,7 @@ def main():
 
                         if not cath_id_src and (SELECT == 'all' or (SELECT == 'wp' and count_src == wp_found)):
                             r = requests_retry_session().get(chorgurl)
-                            priest_tr = []
-                            priest_tr.append(re.findall(b"<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Priest</td>.*</tr>", r.content))
+                            priest_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Priest</td>.*</tr>", r.content)
                                 
                             if len(priest_tr) == 0:
                                 print('-- Not proven on catholic-hierarchy.org')
