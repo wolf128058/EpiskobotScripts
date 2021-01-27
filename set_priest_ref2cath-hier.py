@@ -2,17 +2,19 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=missing-docstring, line-too-long
 
-import progressbar
+import argparse
+import datetime
 import re
+from random import shuffle
 
-import pywikibot
-from pywikibot import pagegenerators as pg
+import progressbar
 
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
-from random import shuffle
+import pywikibot
+from pywikibot import pagegenerators as pg
 
 
 def requests_retry_session(
@@ -35,81 +37,137 @@ def requests_retry_session(
     return session
 
 
-QUERY = '''
-SELECT ?item ?itemLabel ?cathid WHERE {
-  ?item wdt:P106 wd:Q250867;
-    wdt:P1047 ?cathid.
-  OPTIONAL { ?item wdt:P569 ?birth. }
-  FILTER(NOT EXISTS {
-    ?item p:P106 _:b80.
-    _:b80 ps:P106 ?relsub2;
-      prov:wasDerivedFrom _:b30.
-  })
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],de,en". }
-}
-ORDER BY DESC (?birth)
-LIMIT 1000'''
+QUERY = ''
 
-wikidata_site = pywikibot.Site('wikidata', 'wikidata')
 
-generator = pg.WikidataSPARQLPageGenerator(QUERY, site=wikidata_site)
-generator = list(generator)
-shuffle(generator)
+def main():
+    parser = argparse.ArgumentParser(
+        description='Set reference to catholic hierarchy for instance of = human')
+    parser.add_argument('-s', '--select', default='empty', help=r'select entries with empty/wp/all references')
+    args = parser.parse_args()
 
-repo = wikidata_site.data_repository()
+    global QUERY
+    global SELECT
+    SELECT = args.select
 
-with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
-    bar.update(0)
-    for index, item in enumerate(generator):
-        itemdetails = item.get(get_redirect=True)
-        mycathid = ''
+    if args.select == 'empty':
+        QUERY = '''
+        SELECT ?item ?cathid WHERE {
+        ?item wdt:P106 wd:Q250867;
+            wdt:P1047 ?cathid.
+        FILTER(NOT EXISTS {
+            ?item p:P106 _:b80.
+            _:b80 ps:P106 ?relsub2;
+            prov:wasDerivedFrom _:b30.
+        })}'''
+    else:
+        QUERY = '''
+        SELECT ?item ?cathid WHERE {
+        ?item wdt:P106 wd:Q250867;
+            wdt:P1047 ?cathid.
+        }'''
 
-        claim_list_position = itemdetails['claims']['P106']
-        claim_list_cathid = itemdetails['claims']['P1047']
+    wikidata_site = pywikibot.Site('wikidata', 'wikidata')
 
-        for cathids in claim_list_cathid:
-            mycathid = cathids.getTarget()
-            print('>> Catholic-Hierarchy-Id: ' + mycathid)
-            print('>> URL: https://www.wikidata.org/wiki/' + item.id)
+    generator = pg.WikidataSPARQLPageGenerator(QUERY, site=wikidata_site)
+    generator = list(generator)
+    shuffle(generator)
 
-        for rel_claim in claim_list_position:
-            trgt = rel_claim.getTarget()
-            print('-- Claim for {} found.'.format(trgt.id))
-            if trgt.id == 'Q250867':
+    repo = wikidata_site.data_repository()
 
-                rel_claim_sources = rel_claim.getSources()
+    with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
+        bar.update(0)
+        for index, item in enumerate(generator):
 
-                has_src_cath = False
+            now = datetime.datetime.utcnow()
+            my_date4wd = pywikibot.WbTime(
+                year=now.year,
+                month=now.month,
+                day=now.day,
+                precision=11,
+                calendarmodel='http://www.wikidata.org/entity/Q1985727')
 
-                for rel_claim_source in rel_claim_sources:
+            itemdetails = item.get(get_redirect=True)
+            mycathid = ''
+            mywd_id = item.id
+            print("\n" + '>> Checking WD-ID: ' + mywd_id)
+            print('-- WD-URL: https://www.wikidata.org/wiki/' + mywd_id)
 
-                    try:
-                        if rel_claim_source['P1047']:
-                            has_src_cath = True
-                            print('-- Catholic Hierarchy as Source found')
-                    except:
-                        pass
+            claim_list_jobs = itemdetails['claims']['P106']
+            claim_list_cathid = itemdetails['claims']['P1047']
 
-                if not rel_claim_sources or has_src_cath == False:
-                    chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
-                    r = requests_retry_session().get(chorgurl)
+            for cathids in claim_list_cathid:
+                mycathid = cathids.getTarget()
+                chorgurl = 'http://www.catholic-hierarchy.org/bishop/b' + mycathid + '.html'
+                print('-- Catholic-Hierarchy-Id: ' + mycathid)
+                print('-- URL: ' + chorgurl)
 
-                    if r.status_code != 200:
-                        print('### HTTP-ERROR ON cath-id: ' + chorgurl)
-                        continue
+            for job_claim in claim_list_jobs:
+                trgt = job_claim.getTarget()
+                print('-- Claim for {} found.'.format(trgt.id))
+                if trgt.id == 'Q250867':
+                    job_claim_sources = job_claim.getSources()
 
-                    try:
-                        priest_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Priest</td>.*</tr>", r.content)
-                    except:
+                    if len(job_claim_sources) == 0:
+                        r = requests_retry_session().get(chorgurl)
                         priest_tr = []
+                        priest_tr.append(re.findall(b"<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Priest</td>.*</tr>", r.content))                            
 
-                    if len(priest_tr) > 0:
-                        print('-- Priest-Info: ' + priest_tr[0].decode('utf-8'))
-                        source_claim = pywikibot.Claim(repo, 'P1047')
-                        source_claim.setTarget(mycathid)
-                        rel_claim.addSources([source_claim], summary='add catholic-hierarchy as source for position catholic-priest')
+                        if r.status_code == 200 and len(priest_tr) > 0:
+                            print('-- Status 200 received for: ' + chorgurl)
+                            source_claim_statedin = pywikibot.Claim(repo, 'P248')
+                            source_claim_statedin.setTarget(pywikibot.ItemPage(repo, 'Q3892772'))
+                            source_claim_catid = pywikibot.Claim(repo, 'P1047')
+                            source_claim_catid.setTarget(mycathid)
+                            source_claim_retrieved = pywikibot.Claim(repo, 'P813')
+                            source_claim_retrieved.setTarget(my_date4wd)
+                            job_claim.addSources([source_claim_statedin, source_claim_catid, source_claim_retrieved],
+                                                 summary='add catholic-hierarchy as source for beeing catholic priest')
+
                     else:
-                        print('-- No Priest-Ordination Data in table found. I skip.')
-                        continue
-        bar.update(index)
-print('Done!')
+                        cath_id_src = False
+                        wp_found = 0
+                        count_src = 0
+                        for job_claim_source in job_claim_sources:
+                            count_src += 1
+                            print('-- Found claim for beeing catholic priest')
+                            if 'P1047' in job_claim_source:
+                                cath_id_src = True
+                                print('--- Cath-Id-Src found')
+                                if SELECT == 'all':
+                                    claimTarget = job_claim_source['P1047']
+                                    job_claim.removeSources([claimTarget[0]],
+                                                    summary='remove source (will be replaced immediately, if still valid)')
+                                    cath_id_src = False
+                            else:
+                                print('--- Other than Cath-Id-Src found:')
+                                print(job_claim_source)
+                                if 'P143' in job_claim_source:
+                                    wp_found += 1
+                                    print('--- Wikipedia-Source found')
+
+                        if not cath_id_src and (SELECT == 'all' or (SELECT == 'wp' and count_src == wp_found)):
+                            r = requests_retry_session().get(chorgurl)
+                            priest_tr = []
+                            priest_tr.append(re.findall(b"<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Priest</td>.*</tr>", r.content))
+                                
+                            if len(priest_tr) == 0:
+                                print('-- Not proven on catholic-hierarchy.org')
+
+                            if r.status_code == 200 and len(priest_tr) > 0:
+                                print('-- Status 200 received for: ' + chorgurl)
+                                source_claim_statedin = pywikibot.Claim(repo, 'P248')
+                                source_claim_statedin.setTarget(pywikibot.ItemPage(repo, 'Q3892772'))
+                                source_claim_catid = pywikibot.Claim(repo, 'P1047')
+                                source_claim_catid.setTarget(mycathid)
+                                source_claim_retrieved = pywikibot.Claim(repo, 'P813')
+                                source_claim_retrieved.setTarget(my_date4wd)
+                                job_claim.addSources(
+                                    [source_claim_statedin, source_claim_catid, source_claim_retrieved],
+                                    summary='add catholic-hierarchy as source for beeing catholic priest')
+            bar.update(index)
+    print('Done!')
+
+
+if __name__ == '__main__':
+    main()
