@@ -103,16 +103,11 @@ def main():
                 print('-- URL: ' + chorgurl)
 
             for job_claim in claim_list_jobs:
+                yet_set_complete = False
                 trgt = job_claim.getTarget()
                 print('-- Claim for {} found.'.format(trgt.id))
                 if trgt.id == 'Q250867':
                     job_claim_sources = job_claim.getSources()
-                    for job_claim_source in job_claim_sources:
-                        if 'P248' in job_claim_source and 'P1047' in job_claim_source and 'P813' in job_claim_source:
-                            # skip jobs with completed source:
-                            print('-- Sources for this job are completed. Skipping that one.')
-                            continue
-
                     if len(job_claim_sources) == 0:
                         r = requests_retry_session().get(chorgurl)
                         priest_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Priest</td>.*</tr>", r.content)
@@ -127,6 +122,7 @@ def main():
                             source_claim_retrieved.setTarget(my_date4wd)
                             job_claim.addSources([source_claim_statedin, source_claim_catid, source_claim_retrieved],
                                                  summary='add catholic-hierarchy as source for beeing catholic priest')
+                            cath_id_src = True
 
                     else:
                         cath_id_src = False
@@ -136,6 +132,10 @@ def main():
                             count_src += 1
                             print('-- Found claim for beeing catholic priest')
                             if 'P1047' in job_claim_source:
+                                if 'P248' in job_claim_source:
+                                    print(job_claim_sources)
+                                    yet_set_complete = True
+                                    continue
                                 cath_id_src = True
                                 print('--- Cath-Id-Src found')
                                 if SELECT == 'all':
