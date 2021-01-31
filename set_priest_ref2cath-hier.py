@@ -107,6 +107,11 @@ def main():
                 print('-- Claim for {} found.'.format(trgt.id))
                 if trgt.id == 'Q250867':
                     job_claim_sources = job_claim.getSources()
+                    for job_claim_source in job_claim_sources:
+                        if 'P248' in job_claim_source and 'P1047' in job_claim_source and 'P813' in job_claim_source:
+                            # skip jobs with completed source:
+                            print('-- Sources for this job are completed. Skipping that one.')
+                            continue
 
                     if len(job_claim_sources) == 0:
                         r = requests_retry_session().get(chorgurl)
@@ -134,10 +139,13 @@ def main():
                                 cath_id_src = True
                                 print('--- Cath-Id-Src found')
                                 if SELECT == 'all':
-                                    claimTarget = job_claim_source['P1047']
-                                    job_claim.removeSources([claimTarget[0]],
-                                                    summary='remove source (will be replaced immediately, if still valid)')
-                                    cath_id_src = False
+                                    try:
+                                        claimTarget = job_claim_source['P1047']
+                                        job_claim.removeSources([claimTarget[0]],
+                                                        summary='remove source (will be replaced immediately, if still valid)')
+                                        cath_id_src = False
+                                    except:
+                                        print('!! - Error on source-claim removal')
                             else:
                                 print('--- Other than Cath-Id-Src found:')
                                 print(job_claim_source)
