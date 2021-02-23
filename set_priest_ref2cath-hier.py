@@ -18,10 +18,10 @@ from pywikibot import pagegenerators as pg
 
 
 def requests_retry_session(
-        retries=5,
-        backoff_factor=0.3,
-        status_forcelist=(500, 502, 504),
-        session=None,
+    retries=5,
+    backoff_factor=0.3,
+    status_forcelist=(500, 502, 504),
+    session=None,
 ):
     session = session or requests.Session()
     retry = Retry(
@@ -36,13 +36,12 @@ def requests_retry_session(
     session.mount('https://', adapter)
     return session
 
-
 QUERY = ''
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Set reference to catholic hierarchy for instance of = human')
+        description='Set reference to catholic hierarchy for a priest-job')
     parser.add_argument('-s', '--select', default='empty', help=r'select entries with empty/wp/all references')
     args = parser.parse_args()
 
@@ -62,10 +61,10 @@ def main():
         })}'''
     else:
         QUERY = '''
-        SELECT ?item ?cathid WHERE {
+        SELECT ?item ?cathid WHERE (
         ?item wdt:P106 wd:Q250867;
             wdt:P1047 ?cathid.
-        }'''
+        )'''
 
     wikidata_site = pywikibot.Site('wikidata', 'wikidata')
 
@@ -136,6 +135,7 @@ def main():
                                     print(job_claim_sources)
                                     yet_set_complete = True
                                     continue
+
                                 cath_id_src = True
                                 print('--- Cath-Id-Src found')
                                 if SELECT == 'all':
@@ -153,7 +153,7 @@ def main():
                                     wp_found += 1
                                     print('--- Wikipedia-Source found')
 
-                        if not cath_id_src and (SELECT == 'all' or (SELECT == 'wp' and count_src == wp_found)):
+                        if not cath_id_src and not yet_set_complete and (SELECT == 'all' or (SELECT == 'wp' and count_src == wp_found)):
                             r = requests_retry_session().get(chorgurl)
                             priest_tr = re.findall(b"<tr><td[^>]+>(.*)</td><td>.*</td><td>Ordained Priest</td>.*</tr>", r.content)
                                 
