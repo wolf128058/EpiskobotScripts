@@ -30,11 +30,11 @@ if len(sys.argv) == 2:
       FILTER(NOT EXISTS {?item wdt:P39 wd:Q157037})
       FILTER(EXISTS {
         ?item p:P39 ?pos.
-        ?pos pq:P1365 ?statement.
+        ?pos pq:''' + KEY_PREDECESSOR + ''' ?statement.
       })
       FILTER(NOT EXISTS {
         ?item p:P39 ?pos.
-        ?pos pq:P1366 ?statement.
+        ?pos pq:''' + KEY_SUCCESSOR + ''' ?statement.
       })
       FILTER(EXISTS {
         ?item p:P570 ?statement.
@@ -61,8 +61,8 @@ if len(sys.argv) == 2:
         if pos_item_target.id != POSITION:
             print('-- ' + pos_item_target.id + ' is not the correct pos-claim, i skip that one')
             continue
-        else:
-            print('-- Correct pos-claim.')
+
+        print('-- Correct pos-claim.')
 
         my_pos_data = pos_item.getTarget()
         if my_pos_data.id != POSITION:
@@ -86,7 +86,7 @@ if len(sys.argv) == 2:
             print('-- There is no predecessor.')
             continue
 
-    if predecessor == False:
+    if not predecessor:
         exit()
 
 if len(sys.argv) == 3:
@@ -129,8 +129,8 @@ if len(sys.argv) == 3:
                     print(
                         '-- ' + pos_item_target.id + ' is not the correct pos-claim (' + POSITION + '), i skip that one')
                     continue
-                else:
-                    print('-- Correct pos-claim.')
+
+                print('-- Correct pos-claim.')
 
                 my_pos_data = pos_item.getTarget()
                 if my_pos_data.id != POSITION:
@@ -161,7 +161,7 @@ if len(sys.argv) == 3:
                     print('-- There is no predecessor.')
                     continue
 
-        if candidate_found == False:
+        if not candidate_found:
             print('No matching candidate for Position ' + POSITION + ' in Dio ' + COMMON_PROP_VALUE + ' found.')
             exit()
 
@@ -260,36 +260,36 @@ def get_predecessor(officeholder):
             if found_predecessor:
                 return my_predecessor_id
 
+
 # START THAT LOOP:
 
 
 CURRENT_PREDECESSOR = INITIAL_OFFICEHOLDER
 
-chain_running = True
+CHAIN_RUNNING = True
 CURRENT_PREDECESSOR = get_predecessor(INITIAL_OFFICEHOLDER)
 
-if CURRENT_PREDECESSOR == False and POSITION == 'Q48629921':
+if not CURRENT_PREDECESSOR and POSITION == 'Q48629921':
     print('-- Trying to downgrade from Archbishop-Chain to Diocesanbishop-Chain')
     POSITION = 'Q1144278'
     CURRENT_PREDECESSOR = get_predecessor(INITIAL_OFFICEHOLDER)
 
-if CURRENT_PREDECESSOR == False:
-    chain_running = False
+if not CURRENT_PREDECESSOR:
+    CHAIN_RUNNING = False
 else:
     set_successor(CURRENT_PREDECESSOR, POSITION, COMMON_PROP_KEY, COMMON_PROP_VALUE, INITIAL_OFFICEHOLDER)
 
-
-while chain_running:
+while CHAIN_RUNNING:
     old_predecessor = CURRENT_PREDECESSOR
     CURRENT_PREDECESSOR = get_predecessor(CURRENT_PREDECESSOR)
 
-    if CURRENT_PREDECESSOR == False and POSITION == 'Q48629921':
+    if not CURRENT_PREDECESSOR and POSITION == 'Q48629921':
         print('-- Trying to downgrade from Archbishop to Diocesanbishop')
         POSITION = 'Q1144278'
         CURRENT_PREDECESSOR = get_predecessor(old_predecessor)
 
     if not CURRENT_PREDECESSOR:
-        chain_running = False
+        CHAIN_RUNNING = False
     else:
         set_successor(CURRENT_PREDECESSOR, POSITION, COMMON_PROP_KEY, COMMON_PROP_VALUE, old_predecessor)
 
