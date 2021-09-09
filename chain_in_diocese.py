@@ -6,7 +6,6 @@ import random
 import pywikibot
 from pywikibot import pagegenerators as pg
 
-
 INITIAL_OFFICEHOLDER = 'Q69064'
 POSITION = 'Q1144278'  # D-Bishop
 COMMON_PROP_KEY = 'P708'  # Diocese
@@ -90,7 +89,6 @@ if len(sys.argv) == 2:
     if predecessor == False:
         exit()
 
-
 if len(sys.argv) == 3:
     POSITION = sys.argv[1]
     COMMON_PROP_VALUE = sys.argv[2]
@@ -128,7 +126,8 @@ if len(sys.argv) == 3:
 
                 pos_item_target = pos_item.getTarget()
                 if pos_item_target.id != POSITION:
-                    print('-- ' + pos_item_target.id + ' is not the correct pos-claim (' + POSITION + '), i skip that one')
+                    print(
+                        '-- ' + pos_item_target.id + ' is not the correct pos-claim (' + POSITION + '), i skip that one')
                     continue
                 else:
                     print('-- Correct pos-claim.')
@@ -145,8 +144,9 @@ if len(sys.argv) == 3:
                 try:
                     if qualifiers[COMMON_PROP_KEY]:
                         my_propval = qualifiers[COMMON_PROP_KEY][0].getTarget()
-                        if(my_propval.id != COMMON_PROP_VALUE):
-                            print('-- Skipping wrong diocese: ' + my_propval.id + '(Searching for: ' + COMMON_PROP_VALUE + ')')
+                        if my_propval.id != COMMON_PROP_VALUE:
+                            print(
+                                '-- Skipping wrong diocese: ' + my_propval.id + '(Searching for: ' + COMMON_PROP_VALUE + ')')
                             continue
                 except:
                     print('-- Entry has no diocese -> skipping.')
@@ -213,6 +213,7 @@ def get_predecessor(officeholder):
     except:
         print('-- Redirection found.')
         mywd = item.get(get_redirect=True)
+
     claim_list_pos = mywd['claims']['P39']
 
     for pos_item in claim_list_pos:
@@ -242,7 +243,8 @@ def get_predecessor(officeholder):
                     my_successor_id = my_successor.id
                     print('- Successor: ' + my_successor_id)
             except:
-                print('- No Successor found. (For ' + officeholder + ' as ' + POSITION + ' of ' + COMMON_PROP_VALUE + ')')
+                print(
+                    '- No Successor found. (For ' + officeholder + ' as ' + POSITION + ' of ' + COMMON_PROP_VALUE + ')')
 
             try:
                 if qualifiers[KEY_PREDECESSOR]:
@@ -251,7 +253,8 @@ def get_predecessor(officeholder):
                     print('- Predecessor: ' + my_predecessor_id)
                     found_predecessor = True
             except:
-                print('- No Predecessor found. (For ' + officeholder + ' as ' + POSITION + ' of ' + COMMON_PROP_VALUE + ')')
+                print(
+                    '- No Predecessor found. (For ' + officeholder + ' as ' + POSITION + ' of ' + COMMON_PROP_VALUE + ')')
                 return False
 
             if found_predecessor:
