@@ -53,7 +53,7 @@ def dioid2wd(dioid):
             return item.id
 
     except:
-        print('!!! query for diocese failed.')
+        print('!!! query for diocese failed. (dioid: ' + dioid + ')')
         return False
 
 
