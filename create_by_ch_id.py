@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # pylint: disable=missing-docstring, line-too-long
 
+import random
 import re
 import sys
 import configparser
@@ -198,9 +199,11 @@ if REQUEST_RESULT.status_code == 200:
     MYTITLE = MYTITLE.strip()
 
     if MYTITLE.startswith('Bishop '):
+        pos_de = random.choice(['Bischof der römisch-katholischen Kirche', 'römisch-katholischer Bischof', 'katholischer Bischof'])
+        pos_en = random.choice(['bishop of the roman-catholic church', 'roman-catholic bishop', 'catholic bishop'])
         ITEM_PROPERTIES += "\nLAST\tP39\tQ611644\tS1047\t\"" + MY_CH_ID + "\"\t"
-        DEFLINE += "\nLAST\tDde\t\"Bischof der römisch-katholischen Kirche\""
-        DEFLINE += "\nLAST\tDen\t\"bishop of the roman-catholic church\""
+        DEFLINE += "\nLAST\tDde\t\"" + pos_de + "\""
+        DEFLINE += "\nLAST\tDen\t\"" + pos_en + "\""
         DEFLINE += "\nLAST\tDit\t\"vescovo cattolico\""
         DEFLINE += "\nLAST\tDfr\t\"évêque catholique\""
         DEFLINE += "\nLAST\tDpl\t\"biskup katolicki\""
@@ -225,9 +228,11 @@ if REQUEST_RESULT.status_code == 200:
         DEFLINE += "\nLAST\tLen\t\"" + ITEM_LABEL + "\""
 
     elif MYTITLE.startswith('Archbishop '):
+        pos_de = random.choice(['Erzbischof der römisch-katholischen Kirche', 'römisch-katholischer Erzbischof', 'katholischer Erzischof', 'Erzbischof'])
+        pos_en = random.choice(['archbishop of the roman-catholic church', 'roman-catholic archbishop', 'catholic archbishop'])
         ITEM_PROPERTIES += "\nLAST\tP39\tQ48629921\tS1047\t\"" + MY_CH_ID + "\"\t"
-        DEFLINE += "\nLAST\tDde\t\"Erzbischof der römisch-katholischen Kirche\""
-        DEFLINE += "\nLAST\tDen\t\"archbishop of the roman-catholic church\""
+        DEFLINE += "\nLAST\tDde\t\"" + pos_de + "\""
+        DEFLINE += "\nLAST\tDen\t\"" + pos_en + "\""
         DEFLINE += "\nLAST\tDit\t\"arcivescovo cattolico\""
         DEFLINE += "\nLAST\tDes\t\"arzobispo católico\""
         DEFLINE += "\nLAST\tDfr\t\"archevêque catholique\""
