@@ -14,6 +14,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 
+L_LEGALPOS = ['Q45722', 'Q75178', 'Q157037', 'Q611644', 'Q948657', 'Q1144278', 'Q1993358', 'Q15253909', 'Q48629921', 'Q50362553', 'Q103163', 'Q19546', 'Q171692']
 
 def requests_retry_session(
         retries=5,
@@ -108,6 +109,16 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                 claim_list_currentpositions = mywd['claims']['P39']
             except:
                 print('### Job-Claim-Check failed!')
+                continue
+
+            illegal_pos = False
+            for single_pos in claim_list_currentpositions:
+                trgt_pos = single_pos.getTarget()
+                if trgt_pos.id not in L_LEGALPOS:
+                    print('This person has a illegal position. (https://www.wikidata.org/wiki/' + trgt_pos.id + ' ) I skip.')
+                    illegal_pos = True
+
+            if illegal_pos:
                 continue
 
             for single_pos in claim_list_currentpositions:
