@@ -8,12 +8,12 @@ import datetime
 
 import progressbar
 
-import pywikibot
-from pywikibot import pagegenerators as pg
-
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+
+import pywikibot
+from pywikibot import pagegenerators as pg
 
 L_LEGALPOS = ['Q45722', 'Q75178', 'Q157037', 'Q611644', 'Q948657', 'Q1144278', 'Q1993358', 'Q15253909', 'Q48629921', 'Q50362553', 'Q103163', 'Q19546', 'Q171692']
 
@@ -171,10 +171,10 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                             known_a2d = True
                             continue
 
-                    if known_a2d == True:
+                    if known_a2d:
                         continue
 
-                    if (mydiowd != False and mydiowd != None):
+                    if not mydiowd and mydiowd is not None:
                         if len(l_dbishop) == 1:
                             item_properties += "\n" + mywd_id + "\tP39\tQ1144278\tP708\t" + mydiowd
                             item_properties += "\tS1047\t\"" + mycathid + "\"\t"
@@ -224,10 +224,10 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                             known_t2d = True
                             continue
 
-                    if known_t2d == True:
+                    if known_t2d:
                         continue
 
-                    if (mydiowd != False and mydiowd != None):
+                    if not mydiowd and mydiowd is not None:
                         if len(l_tbishop) == 1:
                             item_properties += "\n" + mywd_id + "\tP39\tQ948657\tP708\t" + mydiowd
                             item_properties += "\tS1047\t\"" + mycathid + "\"\t"
