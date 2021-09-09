@@ -38,10 +38,12 @@ def requests_retry_session(
 
 
 def dioid2wd(dioid):
-    QUERY4DIOID = 'SELECT ?item ?itemLabel WHERE { ?item wdt:P1866 "' + dioid + '". }'
+    QUERY4DIOID = 'SELECT ?item WHERE { ?item wdt:P1866 "' + dioid + '". }'
     wikidata_site = pywikibot.Site('wikidata', 'wikidata')
     try:
         generator = pg.WikidataSPARQLPageGenerator(QUERY4DIOID, site=wikidata_site)
+        generator = list(generator)
+
         if len(generator) > 1:
             print('-- DioId ' + dioid + ' is ambiguous.')
             return False
