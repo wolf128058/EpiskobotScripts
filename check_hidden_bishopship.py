@@ -65,7 +65,6 @@ SELECT ?item WHERE {
 # FILTER( ?position NOT IN (wd:Q48629921, wd:Q50362553) )
  FILTER( ?position NOT IN (wd:Q65924966) )
 }
-GROUP BY (?item)
 '''
 
 path4qs = 'data/log_quick_hiddenbishopships.txt'
