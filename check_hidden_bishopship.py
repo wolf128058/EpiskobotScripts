@@ -4,6 +4,7 @@
 
 import re
 from random import shuffle
+import datetime
 
 import progressbar
 
@@ -76,6 +77,15 @@ count_props = 0
 with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as bar:
     bar.update(0)
     for index, item in enumerate(generator):
+
+        now = datetime.datetime.utcnow()
+        my_date4wd = pywikibot.WbTime(
+            year=now.year,
+            month=now.month,
+            day=now.day,
+            precision=11,
+            calendarmodel='http://www.wikidata.org/entity/Q1985727')
+
         mywd = item.get(get_redirect=True)
         mywd_id = item.id
         print("\n" + '>> Checking WD-ID: ' + mywd_id)
@@ -175,6 +185,15 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                             target_dioclaim.setTarget(target_dio)
                             new_claim.setTarget(target_db)
                             new_claim.addQualifier(target_dioclaim)
+
+                            source_claim_statedin = pywikibot.Claim(repo, 'P248')
+                            source_claim_statedin.setTarget(pywikibot.ItemPage(repo, 'Q3892772'))
+                            source_claim_catid = pywikibot.Claim(repo, 'P1047')
+                            source_claim_catid.setTarget(mycathid)
+                            source_claim_retrieved = pywikibot.Claim(repo, 'P813')
+                            source_claim_retrieved.setTarget(my_date4wd)
+                            new_claim.addSources([source_claim_statedin, source_claim_catid, source_claim_retrieved])
+
                             item.addClaim(new_claim, summary='added bishop-claim')
 
             if len(titular_bishopship_tr) > 0:
@@ -220,12 +239,18 @@ with progressbar.ProgressBar(max_value=len(generator), redirect_stdout=True) as 
                             target_dioclaim.setTarget(target_dio)
                             new_claim.setTarget(target_tb)
                             new_claim.addQualifier(target_dioclaim)
+
+                            source_claim_statedin = pywikibot.Claim(repo, 'P248')
+                            source_claim_statedin.setTarget(pywikibot.ItemPage(repo, 'Q3892772'))
+                            source_claim_catid = pywikibot.Claim(repo, 'P1047')
+                            source_claim_catid.setTarget(mycathid)
+                            source_claim_retrieved = pywikibot.Claim(repo, 'P813')
+                            source_claim_retrieved.setTarget(my_date4wd)
+                            new_claim.addSources([source_claim_statedin, source_claim_catid, source_claim_retrieved])
+
                             item.addClaim(new_claim, summary='added titular-bishopship-claim')
 
             bar.update(index)
-            fq = open(path4qs, "a")
-            fq.write(item_properties)
-            fq.close()
             item_properties = ''
 
 print('Done!' + "\n")
